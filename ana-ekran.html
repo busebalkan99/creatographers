@@ -213,22 +213,29 @@ body{background:#050506;color:var(--ink);font-family:"Archivo",system-ui,sans-se
 /* arşiv satırı: her temanın kazananı yan yana (karar 18) */
 .ev .mt{display:block;margin-left:auto;font-size:11px;font-weight:800;letter-spacing:.04em;
   text-transform:none;color:var(--soft)}
-.ev .wins{display:flex;gap:3px;margin-top:11px}
+/* Yakinlik: kolonlar arasi bosluk, kunye ICI bosluktan buyuk olmali. Onceden
+   dis 3px / ic 6px idi, yani oran 0,5 ve kunye komsu fotografa da ait gibi
+   okunuyordu. Simdi dis 9 / ic 4, oran 2,25. */
+.ev .wins{display:flex;gap:9px;margin-top:11px}
 .ev .wins figure{margin:0;flex:1;min-width:0}
 /* Karar 43 kapsamı: kırpma yasağı DEĞERLENDİRİLEN yüzeylerde geçerli
    (oylama, fotoğraf detayı, ödül karesi). Arşivdeki bu kareler gezinme,
    değerlendirme değil — kırpılabilir. */
 .ev .wins img{width:100%;height:96px;object-fit:cover;display:block;background:#17171A}
-.ev .wins figcaption{margin-top:6px}
+.ev .wins figcaption{margin-top:4px}
 .ev .wins figcaption b{display:block;font-size:11px;font-weight:800;letter-spacing:.2em;
   text-transform:uppercase;color:var(--soft)}
 /* uzun isim: kesilmez, iki satira sarar. Yer baştan ayrıldı ki satırlar zıplamasın.
    3 temalı satırda kolon 117px; "Zeynep Aleyna Çetinkaya" (23) ve
    "Abdurrahman Karaosmanoğlu" (25) ikisi de 11px'te iki satıra sığıyor, ölçüldü. */
+/* DAR KOLON ISTISNASI, karar 79'un olcegine bilerek uyulmuyor.
+   Kolon 113px; seviye 4'un 12,5px'i uzun isimleri iki satira sigdiramiyor ve
+   karar 50 kesilmeyi yasakliyor. Karar 73 bu kolonda 11px'i olcup dogrulamisti.
+   Istisna kolon genisligine bagli, punto zevkine degil. */
 .ev .wins figcaption span{
   display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
-  font-size:12.5px;font-weight:900;text-transform:uppercase;letter-spacing:.01em;
-  margin-top:3px;line-height:1.2;min-height:30px;   /* 12,5px'te iki satir 30px eder;
+  font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:.01em;
+  margin-top:3px;line-height:1.2;min-height:26px;   /* 12,5px'te iki satir 30px eder;
      26px iken uzun isimli satirlar 225px, kisalar 221px oluyordu. Karar 50 satir
      yuksekliklerinin ziplamasini yasakliyor, ayrilan yer olcuye getirildi. */
   overflow-wrap:anywhere;

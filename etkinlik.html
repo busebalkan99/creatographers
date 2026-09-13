@@ -267,6 +267,17 @@ body{background:#050506;color:var(--ink);font-family:"Archivo",system-ui,sans-se
 .exif span{margin-left:auto;font-size:11px;font-weight:800;letter-spacing:.04em;
   font-variant-numeric:tabular-nums;text-align:right}
 
+/* Boş tema. Karar 34'ün kuralı: boş yüzey gizlenmiyor, yerinde duruyor ve ne
+   olduğunu söylüyor. Aynı kesikli çerçeve dili, çünkü ekranda zaten "burada bir
+   şey var ama şu an yok" demenin bir biçimi var (kapalı künye). */
+.bostema{margin-top:18px;border:1px dashed var(--rule);padding:22px 16px 24px}
+.bostema b{display:block;font-size:11px;font-weight:800;letter-spacing:.2em;
+  text-transform:uppercase;color:var(--soft);margin-bottom:10px}
+.bostema h3{font-size:15px;font-weight:900;text-transform:uppercase;letter-spacing:.01em;
+  line-height:1.2;font-variation-settings:"wdth" 76,"wght" 900}
+.bostema p{margin-top:10px;font-size:11px;font-weight:800;letter-spacing:.04em;
+  color:var(--soft);line-height:1.6}
+
 /* oylama sürerken: kapalı künye. Ekran boş bırakılmıyor (karar 24). */
 .kapali{margin-top:14px;border:1px dashed var(--rule);padding:13px 12px;
   font-size:11px;line-height:1.6;color:var(--dim)}
@@ -290,6 +301,7 @@ body{background:#050506;color:var(--ink);font-family:"Archivo",system-ui,sans-se
   <button data-s="sayfa" class="on">Etkinlik sayfası</button>
   <button data-s="detay">Detay · sonuç açık</button>
   <button data-s="detay2">Detay · oylama sürüyor</button>
+  <button data-s="bos">Boş tema</button>
 </div>
 <p class="note" id="note"></p>
 
@@ -349,6 +361,7 @@ const foto = (seed,w,h) => `https://picsum.photos/seed/${seed}/${w}/${h}`;
 
 /* ---------- ekran 1: etkinlik sayfası ---------- */
 let aktifTema = 0;   /* hangi tema sekmesi açık */
+let bosTema = false; /* senaryo: bir temaya hiç kare yüklenmemiş */
 
 /* ---------- ekran 1: etkinlik sayfası ---------- */
 /* Yapı: etkinliğin kendi ödülleri üstte, sonra tema sekmeleri.
@@ -360,6 +373,8 @@ let aktifTema = 0;   /* hangi tema sekmesi açık */
    ulaşmak için 3,3 ekran kaydırmak demekti. */
 function sayfa(){
   const t = TEMALAR[aktifTema];
+  /* Boş tema senaryosunda Gece'ye hiç kare yüklenmemiş sayılıyor. */
+  const bos = bosTema && t.ad === 'Gece';
   let h = `
   <div class="mast">${IC_GERI}<span>Creatographers</span><span class="r">Arşiv</span></div>
   <div class="rb"></div>
@@ -396,9 +411,15 @@ function sayfa(){
 
   <div class="tabs" id="tabs">
     ${TEMALAR.map((x,i) => `
-      <button data-t="${i}" class="${i===aktifTema?'on':''}">${x.ad}<i>${x.toplam} kare</i></button>`).join('')}
+      <button data-t="${i}" class="${i===aktifTema?'on':''}">${x.ad}<i>${(bosTema && x.ad==='Gece') ? 0 : x.toplam} kare</i></button>`).join('')}
   </div>
 
+  ${bos ? `
+  <div class="bostema">
+    <b>${t.ad}</b>
+    <h3>Bu temaya<br>kare yüklenmedi</h3>
+    <p>Yükleme penceresi kapandığında bu tema boş kaldı, o yüzden ödülü ve galerisi yok.</p>
+  </div>` : `
   <div class="award">
     <div class="lab">Temanın karesi</div>
     <img src="${foto(t.odul.seed,t.odul.w,t.odul.h)}" width="${t.odul.w}" height="${t.odul.h}" alt="">
@@ -422,9 +443,6 @@ function sayfa(){
   </div>
 
   <div class="sec">${t.ad} galerisi<span>${t.toplam} kare</span></div>
-  ${/* Ilk uc yukarida duruyor: 1. temanin karesi, 2 ve 3 kursude (karar 65).
-       Listede tekrar etmiyorlar. Karar 19'un bes siralisi korunuyor,
-       sadece ucu odul blogunda, ikisi burada. */''}
   ${t.sirali.slice(3).map((r,i) => `
     <div class="row ${r[0]===BEN?'me':''}" data-kare
          data-tema="${t.ad}" data-kim="${r[0]}" data-av="${r[1]}"
@@ -442,7 +460,7 @@ function sayfa(){
         <img src="${foto(t.seed+'-u'+(i+1),300,300)}" alt="">
         <figcaption>${n}</figcaption>
       </figure>`).join('')}
-  </div>`;
+  </div>`}`;
 
   return h;
 }
@@ -496,6 +514,8 @@ const EKRANLAR = {
     not:'Ödüller üstte çünkü etkinliğin sonucu o; galeri altta çünkü gezilecek yer. Kürsü (karar 65) ödül bloğunun içinde: 1. tam genişlikte, 2. ve 3. altında küçük ve sadece numarayla. Galerideki sıralı liste bilerek düz.'},
   detay:  {yap: () => detay(true),
     not:'Sonuç açıldıktan sonra: çeken, ortalama ve iki sütunlu künye. Fotoğraf kitaplarının arka sayfasındaki teknik künye mantığı.'},
+  bos:    {yap: sayfa,
+    not:'Boş tema (karar 34): hiç kare yüklenmemiş tema gizlenmiyor, sekmesi yerinde duruyor ve sayacı 0 gösteriyor. İçeride ödül ve galeri yerine ne olduğunu söyleyen tek blok var.'},
   detay2: {yap: () => detay(false),
     not:'Oylama sürerken (karar 24): çeken ve kamera bilgisi kapalı, ama ekran boş bırakılmıyor. Kendi puanın görünüyor (karar 38), sıra hiçbir zaman görünmüyor.'},
 };
@@ -512,6 +532,10 @@ document.getElementById('tools').addEventListener('click', e => {
   const b = e.target.closest('button'); if (!b) return;
   /* Araç çubuğu prototip kontrolü; elle detaya geçilince örnek kare gösterilir. */
   if (b.dataset.s !== 'sayfa') detayKare = null;
+  /* Boş tema senaryosu sayfanın kendisi, ayrı bir ekran değil: Gece sekmesini
+     boş hâliyle açıyor ki boşluk bağlamı içinde görülsün. */
+  if (b.dataset.s === 'bos') { bosTema = true; aktifTema = 2; return goster('sayfa'); }
+  bosTema = false;
   goster(b.dataset.s);
 });
 document.getElementById('scroll').addEventListener('click', e => {
