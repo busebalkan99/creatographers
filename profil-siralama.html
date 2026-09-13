@@ -21,6 +21,12 @@
   --ink:#EDEDEA;
   --dim:rgba(237,237,234,.58);
   --faint:rgba(237,237,234,.30);
+  /* Metin tonu tabani. --faint (0,30) zeminden 2,38:1 veriyordu, yani ne 4,5:1
+     metin esigini ne 3:1 grafik esigini geciyordu; structure-check turunda
+     bes prototipte 71 kullanimi olcuyle yakalandi. Uc basamagin ucu de artik
+     esigi geciyor: ink 16,87 / dim 6,01 / soft 4,50.
+     --faint duruyor ama yalniz DEKORATIF yuzeylerde (cizgi, cerceve, centik). */
+  --soft:rgba(237,237,234,.49);
   --rule:rgba(237,237,234,.18);
   --grain:.045;
   --pad:16px;                 /* Apple HIG 16pt · Material 3 16dp */
@@ -45,7 +51,7 @@ body{background:#050506;color:var(--ink);font-family:"Archivo",system-ui,sans-se
 }
 .tools button.on{background:var(--ink);color:var(--paper);border-color:var(--ink)}
 .tools .lbl{font-size:9px;font-weight:800;letter-spacing:.18em;text-transform:uppercase;
-  color:var(--faint);align-self:center;margin-right:2px}
+  color:var(--soft);align-self:center;margin-right:2px}
 
 .device{
   width:min(390px,100vw);height:844px;max-height:calc(100dvh - 92px);
@@ -59,9 +65,9 @@ body{background:#050506;color:var(--ink);font-family:"Archivo",system-ui,sans-se
 .scroll{flex:1;min-height:0;overflow-y:auto;padding:14px var(--pad) 18px;scrollbar-width:none}
 .scroll::-webkit-scrollbar{display:none}
 
-.mast{display:flex;font-size:9px;font-weight:800;letter-spacing:.22em;text-transform:uppercase;
-  color:var(--faint)}
-.mast .r{margin-left:auto;letter-spacing:.16em}
+.mast{display:flex;font-size:11px;font-weight:800;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--soft)}
+.mast .r{margin-left:auto;letter-spacing:.2em}
 .rb{height:4px;background:var(--ink);margin-top:8px}   /* mürekkep ayraç, ışımaz */
 
 /* Karar 79, seviye 1: bölüm başlığı mürekkep rengi + üstünde 4px tam taşma ayraç.
@@ -70,8 +76,8 @@ body{background:#050506;color:var(--ink);font-family:"Archivo",system-ui,sans-se
 .sec{margin-top:26px;border-top:4px solid var(--ink);padding-top:12px;padding-bottom:12px;
   font-size:13px;font-weight:900;letter-spacing:.16em;
   text-transform:uppercase;color:var(--ink);display:flex;align-items:baseline}
-.sec span{margin-left:auto;font-size:11px;font-weight:800;letter-spacing:.04em;
-  color:var(--faint);text-align:right;font-variant-numeric:tabular-nums}
+.sec span{margin-left:auto;font-size:11px;font-weight:800;letter-spacing:.04em;text-transform:none;
+  color:var(--soft);text-align:right;font-variant-numeric:tabular-nums}
 
 /* ---------- boş / kilitli blok ---------- */
 /* Parça 1'deki kapalı kamera künyesiyle aynı dil: kesikli çerçeve.
@@ -80,32 +86,32 @@ body{background:#050506;color:var(--ink);font-family:"Archivo",system-ui,sans-se
    Yuvarlaklık kaldırıldı: karar 61 yuvarlaklığı MEKANİZMAYA veriyor (topuz, çip,
    düğme, onay kutusu, rozet çerçevesi). Boş durum bir panel, kontrol değil. */
 .empty{border:1px dashed rgba(237,237,234,.26);padding:15px 14px 16px}
-.empty b{display:block;font-size:12px;font-weight:900;text-transform:uppercase;letter-spacing:.03em}
-.empty span{display:block;font-size:10px;line-height:1.6;color:var(--faint);margin-top:6px;max-width:34ch}
+.empty b{display:block;font-size:12.5px;font-weight:900;text-transform:uppercase;letter-spacing:.01em}
+.empty span{display:block;font-size:10px;line-height:1.6;color:var(--soft);margin-top:6px;max-width:34ch}
 
 /* ================= SIRALAMA ================= */
 .seas{margin-top:14px;display:flex;align-items:baseline;gap:9px}
 .seas h2{font-size:26px;line-height:.86;letter-spacing:-.035em;text-transform:uppercase;
   font-variation-settings:"wdth" 70,"wght" 900}
-.seas .of{margin-left:auto;font-size:9px;font-weight:800;letter-spacing:.16em;
-  text-transform:uppercase;color:var(--faint)}
+.seas .of{margin-left:auto;font-size:11px;font-weight:800;letter-spacing:.04em;
+  text-transform:none;color:var(--soft)}
 .prog{display:flex;gap:4px;margin-top:10px}
 .prog i{flex:1;height:4px;background:rgba(237,237,234,.14);display:block}
 .prog i.on{background:var(--ink)}
 
 /* Müdavim: ters çevrilmiş mürekkep şerit. Karar 55: çoğul ve tabansız. */
 .mud{background:var(--ink);color:var(--paper);margin-top:14px;padding:11px var(--pad) 12px}
-.mud .k{font-size:8.5px;font-weight:800;letter-spacing:.2em;text-transform:uppercase;
+.mud .k{font-size:11px;font-weight:800;letter-spacing:.2em;text-transform:uppercase;
   opacity:.6;display:flex}
 .mud .k span{margin-left:auto;letter-spacing:.14em}
 .mud .big{font-size:26px;line-height:.9;letter-spacing:-.03em;text-transform:uppercase;margin-top:6px;
   font-variation-settings:"wdth" 70,"wght" 900}
-.mud .one{font-size:17px;font-weight:900;text-transform:uppercase;letter-spacing:.01em;
+.mud .one{font-size:17px;font-weight:900;text-transform:uppercase;letter-spacing:-.02em;
   margin-top:5px;line-height:1.25;font-variation-settings:"wdth" 78,"wght" 900}
 /* Satır aralığı 2,6: isimler dokunulabilir olunca (karar 58) hedef boyu gerekiyordu.
    1,7'de 19px kalıyordu. Sırasız bloktaki 2,8 ile aynı mantık, burada bir tık daha dar
    çünkü şerit 14 isimde fazla uzuyor. */
-.mud .list{font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:.01em;
+.mud .list{font-size:12.5px;font-weight:900;text-transform:uppercase;letter-spacing:.01em;
   margin-top:9px;line-height:3.1;opacity:.78}   /* 11px x 3,1 = 34px, sırasız blokla aynı */
 /* Karar 58: isim nerede görünüyorsa oraya dokunulabilir. Şerit ters çevrilmiş kart,
    o yüzden düğme kartın kendi mürekkebini miras alıyor. */
@@ -121,37 +127,37 @@ body{background:#050506;color:var(--ink);font-family:"Archivo",system-ui,sans-se
 .row{border-top:1px solid var(--rule);min-height:48px;display:flex;align-items:center;gap:10px;
   padding:7px 0;cursor:pointer;background:none;border-left:0;border-right:0;border-bottom:0;
   width:100%;text-align:left;color:inherit;font:inherit;appearance:none}
-.row .no{font-size:15px;line-height:1;color:var(--faint);width:15px;flex:0 0 auto;
-  font-variation-settings:"wdth" 68,"wght" 900;font-variant-numeric:tabular-nums}
+.row .no{font-size:11px;line-height:1;color:var(--soft);width:15px;flex:0 0 auto;
+  font-variation-settings:"wdth" 68,"wght" 800;font-variant-numeric:tabular-nums}
 .row img{width:44px;height:44px;object-fit:cover;flex:0 0 auto;background:#17171A;display:block}
 .row .nm{font-size:12.5px;font-weight:900;text-transform:uppercase;letter-spacing:.01em;
   line-height:1.2;overflow-wrap:anywhere;min-width:0}
-.row .av{margin-left:auto;font-size:16px;letter-spacing:-.02em;flex:0 0 auto;
+.row .av{margin-left:auto;font-size:17px;letter-spacing:-.02em;flex:0 0 auto;
   font-variation-settings:"wdth" 72,"wght" 900;font-variant-numeric:tabular-nums}
 /* Karar 59: kendi satırın, soldan yeşil kenar */
 .row.me{box-shadow:inset 3px 0 0 var(--me);padding-left:9px}
 
 /* Sırasız blok: düz metin akışı. Satır hâline getirmek sıralıymış gibi okutur. */
 .unr{margin-top:16px;border-top:4px solid var(--ink);padding-top:11px}
-.unr .hd{font-size:9px;font-weight:800;letter-spacing:.2em;text-transform:uppercase;
-  color:var(--faint);line-height:1.5}
+.unr .hd{font-size:11px;font-weight:800;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--soft);line-height:1.5}
 /* Satır aralığı 2,8: her isim ~34px dokunma hedefi. 2'de 24px kalıyordu, kural 48px.
    4'e çıkarmak 48'i karşılardı ama aralar açılınca blok yeniden liste gibi okunuyor,
    kaçındığımız şey oydu. 2,8 taşma ya da üst üste binme yapmadan en fazlasını veriyor. */
-.unr .names{margin-top:10px;font-size:12px;font-weight:900;text-transform:uppercase;
+.unr .names{margin-top:10px;font-size:12.5px;font-weight:900;text-transform:uppercase;
   letter-spacing:.01em;color:var(--dim);line-height:2.8}
 .unr .names button{appearance:none;border:0;background:none;font:inherit;color:inherit;
   cursor:pointer;margin-right:9px;padding:0}
 .unr .names button.me{background:var(--me);color:var(--ink);padding:2px 6px;border-radius:2px}
 
 /* ================= PROFİL ================= */
-.back{appearance:none;border:0;background:none;font:inherit;color:var(--faint);cursor:pointer;
-  font-size:9px;font-weight:800;letter-spacing:.2em;text-transform:uppercase;padding:0;
+.back{appearance:none;border:0;background:none;font:inherit;color:var(--soft);cursor:pointer;
+  font-size:11px;font-weight:800;letter-spacing:.2em;text-transform:uppercase;padding:0;
   min-height:24px;display:flex;align-items:center}
 .pname{font-size:29px;line-height:.86;letter-spacing:-.035em;text-transform:uppercase;margin-top:12px;
   font-variation-settings:"wdth" 70,"wght" 900;overflow-wrap:anywhere}
-.since{font-size:9px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;
-  color:var(--faint);margin-top:8px;line-height:1.6}
+.since{font-size:11px;font-weight:800;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--soft);margin-top:8px;line-height:1.6}
 .stats{display:flex;margin-top:13px;border-top:1px solid var(--rule);border-bottom:1px solid var(--rule)}
 /* Dikey pay: 22px rakamlar için 10px azdı, sayı üstteki saç teline yapışıyordu.
    Yatay pay: içerik hücre kenarından 0px içerideydi, yani 2. ve 3. sütunun rakamları
@@ -160,25 +166,25 @@ body{background:#050506;color:var(--ink);font-family:"Archivo",system-ui,sans-se
 .stats div{flex:1;padding:14px 12px 15px 0;border-right:1px solid var(--rule)}
 .stats div + div{padding-left:12px}
 .stats div:last-child{border-right:0;padding-right:0}
-.stats b{display:block;font-size:22px;letter-spacing:-.03em;
+.stats b{display:block;font-size:17px;letter-spacing:-.02em;
   font-variation-settings:"wdth" 70,"wght" 900;font-variant-numeric:tabular-nums}
-.stats.zero b{color:var(--faint)}
-.stats span{display:block;font-size:8px;font-weight:800;letter-spacing:.16em;
-  text-transform:uppercase;color:var(--faint);margin-top:6px}
+.stats.zero b{color:var(--soft)}
+.stats span{display:block;font-size:11px;font-weight:800;letter-spacing:.2em;
+  text-transform:uppercase;color:var(--soft);margin-top:6px}
 
 /* Katkı işaretleri: çerçeveli, renksiz, 2px (karar 61) */
 .badges{display:flex;flex-direction:column;gap:7px}
 .badge{border:1px solid var(--rule);border-radius:2px;padding:9px 11px 10px}
-.badge b{display:block;font-size:11.5px;font-weight:900;text-transform:uppercase;letter-spacing:.03em}
-.badge span{display:block;font-size:9.5px;line-height:1.5;color:var(--faint);margin-top:4px}
+.badge b{display:block;font-size:12.5px;font-weight:900;text-transform:uppercase;letter-spacing:.01em}
+.badge span{display:block;font-size:9.5px;line-height:1.5;color:var(--soft);margin-top:4px}
 
 /* Çekim tarifi: kamera verisinden, en az 3 kare (karar 57) */
 .habit{border-top:1px solid var(--rule);display:flex;align-items:baseline;gap:10px;padding:9px 0}
-.habit .k{font-size:8.5px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;
-  color:var(--faint);width:82px;flex:0 0 auto}
+.habit .k{font-size:11px;font-weight:800;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--soft);width:82px;flex:0 0 auto}
 .habit .v{font-size:12.5px;font-weight:900;text-transform:uppercase;letter-spacing:.01em}
-.habit .n{margin-left:auto;font-size:8.5px;font-weight:800;letter-spacing:.12em;
-  text-transform:uppercase;color:var(--faint);font-variant-numeric:tabular-nums;text-align:right}
+.habit .n{margin-left:auto;font-size:11px;font-weight:800;letter-spacing:.04em;
+  text-transform:none;color:var(--soft);font-variant-numeric:tabular-nums;text-align:right}
 
 /* Satır arası sütun arasından çok daha geniş. Eşit olduğunda künye kendi karesinden
    5px, alttaki kareden 3px uzakta kalıyordu ve yazı bir alttaki fotoğrafa aitmiş gibi
@@ -199,13 +205,13 @@ body{background:#050506;color:var(--ink);font-family:"Archivo",system-ui,sans-se
    yazıdan sarkıyor, puan ile etiket de birbirine göre 0,6px kayıyordu.
    baseline hizası üçünü de aynı çizgiye oturtuyor; yazısı olmayan çubuk için
    flexbox alt kenarını taban çizgisi sayıyor, yani çubuk çizginin üstüne oturuyor. */
-.grid figcaption{margin-top:5px;height:12px;font-size:8px;font-weight:800;letter-spacing:.12em;
-  text-transform:uppercase;color:var(--faint);display:flex;align-items:baseline;gap:5px;
+.grid figcaption{margin-top:5px;height:12px;font-size:11px;font-weight:800;letter-spacing:.04em;
+  text-transform:none;color:var(--soft);display:flex;align-items:baseline;gap:5px;
   line-height:1}
 /* Puan kendi etiketinin YANINDA. Sağa itildiğinde kendi adından kopuyor ve bir sonraki
    kolonun adına yapışıyordu: "SOKAK ... 7,9 PORTRE" diye okunuyordu. */
 .grid figcaption b{font-size:11px;line-height:1;color:var(--ink);
-  letter-spacing:-.01em;font-variation-settings:"wdth" 72,"wght" 900;font-variant-numeric:tabular-nums}
+  letter-spacing:.04em;font-variation-settings:"wdth" 72,"wght" 800;font-variant-numeric:tabular-nums}
 /* Sıralamaya giren karenin izi: ince mürekkep çubuk + parlak tema adı.
    Puanın varlığı tek başına yetmiyordu, "neden bunun puanı var da bunun yok"
    sorusu cevapsız kalıyordu (parça 1 spec'i bu riski zaten işaretlemişti).
@@ -213,8 +219,8 @@ body{background:#050506;color:var(--ink);font-family:"Archivo",system-ui,sans-se
    Karar 38: SIRA hiçbir profilde gösterilmiyor, sadece girip girmediği. */
 .grid figcaption i{width:2px;height:9px;background:var(--ink);display:block;flex:0 0 auto}
 .grid figure.sirali figcaption{color:var(--dim)}
-.gridnot{margin-top:9px;font-size:9px;font-weight:800;letter-spacing:.14em;
-  text-transform:uppercase;color:var(--faint);line-height:1.6}
+.gridnot{margin-top:9px;font-size:11px;font-weight:800;letter-spacing:.04em;
+  text-transform:none;color:var(--soft);line-height:1.6}
 
 /* Ayarlar: sadece kendi profilinde */
 .setrow{border-top:1px solid var(--rule);display:flex;align-items:flex-start;gap:11px;
@@ -236,35 +242,35 @@ body{background:#050506;color:var(--ink);font-family:"Archivo",system-ui,sans-se
 .box.on::after{content:'';position:absolute;left:50%;top:46%;width:5px;height:9px;
   border:solid var(--paper);border-width:0 2px 2px 0;
   transform:translate(-50%,-50%) rotate(45deg)}
-.setrow .tx b{display:block;font-size:11.5px;font-weight:900;text-transform:uppercase;letter-spacing:.02em}
-.setrow .tx span{display:block;font-size:9.5px;line-height:1.55;color:var(--faint);margin-top:4px}
+.setrow .tx b{display:block;font-size:12.5px;font-weight:900;text-transform:uppercase;letter-spacing:.01em}
+.setrow .tx span{display:block;font-size:9.5px;line-height:1.55;color:var(--soft);margin-top:4px}
 .out{margin-top:14px;border:1px solid var(--rule);border-radius:2px;min-height:48px;
-  display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:900;
-  letter-spacing:.18em;text-transform:uppercase;color:var(--dim);cursor:pointer}
+  display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;
+  letter-spacing:.2em;text-transform:uppercase;color:var(--dim);cursor:pointer}
 
 /* ================= ETKİNLİKLER ================= */
 .next{margin-top:14px;padding:13px 0;border-top:4px solid var(--ink);
   border-bottom:1px solid var(--rule);display:flex;align-items:baseline;gap:10px}
-.next .k{font-size:9px;font-weight:800;letter-spacing:.2em;text-transform:uppercase;color:var(--faint)}
-.next .v{margin-left:auto;font-size:22px;letter-spacing:-.03em;
+.next .k{font-size:11px;font-weight:800;letter-spacing:.2em;text-transform:uppercase;color:var(--soft)}
+.next .v{margin-left:auto;font-size:17px;letter-spacing:-.02em;
   font-variation-settings:"wdth" 70,"wght" 900;font-variant-numeric:tabular-nums}
-.next .u{font-size:9px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:var(--faint)}
+.next .u{font-size:11px;font-weight:800;letter-spacing:.04em;text-transform:none;color:var(--soft)}
 .ev{border-top:1px solid var(--rule);padding:12px 0 13px}
 .ev .top{display:flex;align-items:baseline;gap:10px}
-.ev .no{font-size:21px;line-height:1;letter-spacing:-.03em;color:var(--faint);
+.ev .no{font-size:17px;line-height:1;letter-spacing:-.02em;color:var(--soft);
   font-variation-settings:"wdth" 68,"wght" 900;font-variant-numeric:tabular-nums;width:30px;flex:0 0 auto}
-.ev .mo{font-size:17px;font-weight:900;text-transform:uppercase;letter-spacing:.01em;
+.ev .mo{font-size:12.5px;font-weight:900;text-transform:uppercase;letter-spacing:.01em;
   font-variation-settings:"wdth" 76,"wght" 900}
-.ev .ct{margin-left:auto;font-size:9px;font-weight:800;letter-spacing:.12em;
-  text-transform:uppercase;color:var(--faint)}
+.ev .ct{margin-left:auto;font-size:11px;font-weight:800;letter-spacing:.04em;
+  text-transform:none;color:var(--soft)}
 .ev .wins{display:flex;gap:3px;margin-top:11px}
 .ev .wins figure{margin:0;flex:1;min-width:0}
 .ev .wins img{width:100%;height:96px;object-fit:cover;display:block;background:#17171A}
-.ev .wins figcaption b{display:block;font-size:8px;font-weight:800;letter-spacing:.18em;
-  text-transform:uppercase;color:var(--faint);margin-top:6px}
+.ev .wins figcaption b{display:block;font-size:11px;font-weight:800;letter-spacing:.2em;
+  text-transform:uppercase;color:var(--soft);margin-top:6px}
 /* Karar 50: isim kesilmez, iki satıra sarar, yer baştan ayrılır */
 .ev .wins figcaption span{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;
-  overflow:hidden;font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:.01em;
+  overflow:hidden;font-size:12.5px;font-weight:900;text-transform:uppercase;letter-spacing:.01em;
   margin-top:3px;line-height:1.2;min-height:26px;overflow-wrap:anywhere}
 .ev[data-t="3"] .wins figcaption span.uzun{font-size:9.5px;line-height:1.25}
 
@@ -273,8 +279,8 @@ body{background:#050506;color:var(--ink);font-family:"Archivo",system-ui,sans-se
 .tabs button{
   appearance:none;border:0;border-right:1px solid var(--rule);background:none;font:inherit;
   min-height:48px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;
-  font-size:8.5px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;
-  color:var(--faint);cursor:pointer;
+  font-size:11px;font-weight:800;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--soft);cursor:pointer;
 }
 .tabs button:last-child{border-right:0}
 /* Karar 47: "ışıklar açık" hâli, aşama rengi yok. Aktif sekme mürekkep. Işımaz (karar 60). */

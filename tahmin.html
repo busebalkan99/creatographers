@@ -35,6 +35,12 @@
   --ink:#EDEDEA;
   --dim:rgba(237,237,234,.58);
   --faint:rgba(237,237,234,.30);
+  /* Metin tonu tabani. --faint (0,30) zeminden 2,38:1 veriyordu, yani ne 4,5:1
+     metin esigini ne 3:1 grafik esigini geciyordu; structure-check turunda
+     bes prototipte 71 kullanimi olcuyle yakalandi. Uc basamagin ucu de artik
+     esigi geciyor: ink 16,87 / dim 6,01 / soft 4,50.
+     --faint duruyor ama yalniz DEKORATIF yuzeylerde (cizgi, cerceve, centik). */
+  --soft:rgba(237,237,234,.49);
   --rule:rgba(237,237,234,.18);
   --grain:.045;
   --pad:16px;
@@ -53,7 +59,7 @@ body{background:#050506;color:var(--ink);font-family:"Archivo",system-ui,sans-se
   padding:10px 12px;cursor:pointer;border-radius:2px}
 .tools button.on{background:var(--ink);color:var(--paper);border-color:var(--ink)}
 .tools .lbl{font-size:9px;font-weight:800;letter-spacing:.18em;text-transform:uppercase;
-  color:var(--faint);align-self:center;margin-right:2px}
+  color:var(--soft);align-self:center;margin-right:2px}
 
 .device{width:min(390px,100vw);height:844px;max-height:calc(100dvh - 92px);
   position:relative;overflow:hidden;background:var(--paper);border:1px solid var(--rule);
@@ -63,7 +69,7 @@ body{background:#050506;color:var(--ink);font-family:"Archivo",system-ui,sans-se
 .sc{flex:1;min-height:0;overflow-y:auto;padding:14px var(--pad) 16px;scrollbar-width:none}
 .sc::-webkit-scrollbar{display:none}
 
-.mast{display:flex;font-size:9px;font-weight:800;letter-spacing:.22em;text-transform:uppercase;color:var(--faint)}
+.mast{display:flex;font-size:11px;font-weight:800;letter-spacing:.2em;text-transform:uppercase;color:var(--soft)}
 .mast .r{margin-left:auto;letter-spacing:.16em}
 .rb{height:4px;background:var(--ink);margin-top:8px}
 .hair{height:1px;background:var(--rule);margin-top:13px}
@@ -77,8 +83,8 @@ p.lede{font-size:13px;color:var(--dim);line-height:1.6;letter-spacing:.02em;marg
 .prog i{flex:1;height:4px;background:rgba(237,237,234,.14);display:block}
 .prog i.on{background:var(--acc);box-shadow:var(--glow)}
 
-.soru{font-size:9.5px;font-weight:800;letter-spacing:.2em;text-transform:uppercase;
-  color:var(--faint);margin-top:13px}
+.soru{font-size:11px;font-weight:800;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--soft);margin-top:13px}
 /* Karar 43'ün mantığı burada da geçerli: tahmin etmek için kareye bakman gerekiyor,
    kırpmak tanımanı sağlayacak ipuçlarını gizleyebilir. Fotoğraf kendi oranında,
    kalan boşluğu alarak duruyor. */
@@ -90,24 +96,24 @@ p.lede{font-size:13px;color:var(--dim);line-height:1.6;letter-spacing:.02em;marg
 /* dört aday */
 .dort{display:flex;flex-direction:column;gap:6px;margin-top:13px}
 .nm{appearance:none;border:1px solid var(--rule);background:transparent;color:var(--ink);
-  font:inherit;font-size:13px;font-weight:900;text-transform:uppercase;letter-spacing:.01em;
+  font:inherit;font-size:12.5px;font-weight:900;text-transform:uppercase;letter-spacing:.01em;
   cursor:pointer;border-radius:2px;text-align:left;overflow-wrap:anywhere;line-height:1.2;
   min-height:56px;padding:10px 12px;display:flex;align-items:center}
 .nm.on{background:var(--ink);color:var(--paper);border-color:var(--ink)}
 .gec{margin-top:11px;appearance:none;border:0;background:none;width:100%;
-  font:inherit;font-size:9.5px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;
-  color:var(--faint);min-height:48px;cursor:pointer}
+  font:inherit;font-size:11px;font-weight:800;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--soft);min-height:48px;cursor:pointer}
 
 /* kilit uyarısı */
 .uyari{border:1px dashed rgba(237,237,234,.26);padding:15px 14px 16px;margin-top:15px}
-.uyari b{display:block;font-size:12px;font-weight:900;text-transform:uppercase;letter-spacing:.03em}
-.uyari span{display:block;font-size:10px;line-height:1.6;color:var(--faint);margin-top:6px;max-width:34ch}
+.uyari b{display:block;font-size:12.5px;font-weight:900;text-transform:uppercase;letter-spacing:.01em}
+.uyari span{display:block;font-size:10px;line-height:1.6;color:var(--soft);margin-top:6px;max-width:34ch}
 
 .buyuk{appearance:none;border:0;background:var(--ink);color:var(--paper);width:100%;
-  font:inherit;font-size:12px;font-weight:900;letter-spacing:.16em;text-transform:uppercase;
+  font:inherit;font-size:11px;font-weight:800;letter-spacing:.2em;text-transform:uppercase;
   min-height:58px;border-radius:2px;cursor:pointer;margin-top:14px}
 .ikincil{appearance:none;border:1px solid var(--rule);background:none;color:var(--dim);width:100%;
-  font:inherit;font-size:10px;font-weight:900;letter-spacing:.18em;text-transform:uppercase;
+  font:inherit;font-size:11px;font-weight:800;letter-spacing:.2em;text-transform:uppercase;
   min-height:48px;border-radius:2px;cursor:pointer;margin-top:9px}
 
 /* sonuç */
@@ -116,13 +122,13 @@ p.lede{font-size:13px;color:var(--dim);line-height:1.6;letter-spacing:.02em;marg
 .skor{display:flex;align-items:baseline;gap:10px;margin-top:20px}
 .skor b{font-size:52px;line-height:.8;letter-spacing:-.05em;
   font-variation-settings:"wdth" 68,"wght" 900;font-variant-numeric:tabular-nums}
-.skor span{font-size:10px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:var(--faint)}
+.skor span{font-size:11px;font-weight:800;letter-spacing:.2em;text-transform:uppercase;color:var(--soft)}
 .cevap{border-top:1px solid var(--rule);display:flex;align-items:center;gap:10px;padding:8px 0;min-height:56px}
 .cevap img{width:44px;height:44px;object-fit:cover;flex:0 0 auto;background:#17171A;display:block}
-.cevap .kim{font-size:12px;font-weight:900;text-transform:uppercase;letter-spacing:.01em;
+.cevap .kim{font-size:12.5px;font-weight:900;text-transform:uppercase;letter-spacing:.01em;
   line-height:1.25;overflow-wrap:anywhere;min-width:0}
-.cevap .kim em{display:block;font-style:normal;font-size:8.5px;font-weight:800;letter-spacing:.14em;
-  color:var(--faint);margin-top:3px}
+.cevap .kim em{display:block;font-style:normal;font-size:11px;font-weight:800;letter-spacing:.04em;
+  color:var(--soft);margin-top:3px}
 /* Doğru işareti: soldan ince mürekkep çubuk. Profildeki "sıralamaya girdi" işaretinin
    aynı dili, yeni bir biçim icat edilmiyor.
    Önce onay kutusu kullanılmıştı (mürekkep blok + tik) ama o şekil ayarlardaki
@@ -136,22 +142,22 @@ p.lede{font-size:13px;color:var(--dim);line-height:1.6;letter-spacing:.02em;marg
 
 /* tanınma satırı, fotoğraf detayında */
 .tan{border-top:1px solid var(--rule);display:flex;align-items:baseline;gap:10px;padding:11px 0}
-.tan .k{font-size:8.5px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;
-  color:var(--faint);width:86px;flex:0 0 auto}
+.tan .k{font-size:11px;font-weight:800;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--soft);width:86px;flex:0 0 auto}
 .tan .v{font-size:12.5px;font-weight:900;text-transform:uppercase;letter-spacing:.01em}
-.tan .n{margin-left:auto;font-size:8.5px;font-weight:800;letter-spacing:.12em;
-  text-transform:uppercase;color:var(--faint);font-variant-numeric:tabular-nums}
+.tan .n{margin-left:auto;font-size:11px;font-weight:800;letter-spacing:.04em;
+  text-transform:none;color:var(--soft);font-variant-numeric:tabular-nums}
 
 .alt{flex:0 0 auto;border-top:1px solid var(--rule);padding:11px var(--pad) 13px;
   display:flex;align-items:center;gap:10px}
 /* Karar 79: bu blok zaten iki katmanlı (üstte sönük etiket, altta mürekkep gövde),
    yani hiyerarşi doğru kurulmuş. Yalnız puntolar seviye tablosuna getirildi:
    etiket 11px sönük (seviye 2), gövde 13px mürekkep (seviye 1). */
-.alt .sec{font-size:11px;font-weight:800;letter-spacing:.2em;text-transform:uppercase;color:var(--faint)}
-.alt .sec b{color:var(--ink);display:block;font-size:13px;margin-top:5px;letter-spacing:.02em;
+.alt .sec{font-size:11px;font-weight:800;letter-spacing:.2em;text-transform:uppercase;color:var(--soft)}
+.alt .sec b{color:var(--ink);display:block;font-size:12.5px;margin-top:5px;letter-spacing:.01em;
   font-weight:900;overflow-wrap:anywhere}
 .ileri{margin-left:auto;appearance:none;border:0;background:var(--ink);color:var(--paper);
-  font:inherit;font-size:11px;font-weight:900;letter-spacing:.16em;text-transform:uppercase;
+  font:inherit;font-size:11px;font-weight:800;letter-spacing:.2em;text-transform:uppercase;
   min-height:48px;padding:0 18px;border-radius:2px;cursor:pointer;opacity:.35;pointer-events:none;
   flex:0 0 auto}
 .ileri.hazir{opacity:1;pointer-events:auto}

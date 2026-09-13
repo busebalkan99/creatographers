@@ -20,6 +20,12 @@
   --ink:#EDEDEA;
   --dim:rgba(237,237,234,.58);
   --faint:rgba(237,237,234,.30);
+  /* Metin tonu tabani. --faint (0,30) zeminden 2,38:1 veriyordu, yani ne 4,5:1
+     metin esigini ne 3:1 grafik esigini geciyordu; structure-check turunda
+     bes prototipte 71 kullanimi olcuyle yakalandi. Uc basamagin ucu de artik
+     esigi geciyor: ink 16,87 / dim 6,01 / soft 4,50.
+     --faint duruyor ama yalniz DEKORATIF yuzeylerde (cizgi, cerceve, centik). */
+  --soft:rgba(237,237,234,.49);
   --rule:rgba(237,237,234,.18);
   --grain:.045;
   --pad:16px;                 /* Apple HIG 16pt · Material 3 16dp */
@@ -65,7 +71,7 @@ body{
 /* ---------- 1. künye satırı ---------- */
 .masthead{
   flex:0 0 auto;display:flex;align-items:baseline;gap:10px;
-  font-size:9.5px;font-weight:800;letter-spacing:.22em;text-transform:uppercase;color:var(--faint);
+  font-size:9.5px;font-weight:800;letter-spacing:.22em;text-transform:uppercase;color:var(--soft);
 }
 .masthead .right{margin-left:auto;letter-spacing:.16em}
 
@@ -84,7 +90,7 @@ body{
   font-variant-numeric:tabular-nums;
 }
 .plate .of{
-  font-size:10px;font-weight:800;letter-spacing:.16em;color:var(--faint);
+  font-size:10px;font-weight:800;letter-spacing:.16em;color:var(--soft);
   text-transform:uppercase;padding-bottom:5px;
 }
 .plate .theme{
@@ -94,7 +100,7 @@ body{
 }
 .plate .theme small{
   display:block;font-size:9px;font-weight:700;letter-spacing:.18em;
-  color:var(--faint);margin-top:3px;
+  color:var(--soft);margin-top:3px;
   font-variation-settings:"wdth" 100,"wght" 700;
 }
 
@@ -124,14 +130,14 @@ body{
 /* ---------- 5. puan ---------- */
 .rate{flex:0 0 auto;padding-top:12px}
 .rate .row{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:11px}
-.rate .lab{font-size:10px;font-weight:800;letter-spacing:.2em;text-transform:uppercase;color:var(--faint);padding-bottom:6px}
+.rate .lab{font-size:10px;font-weight:800;letter-spacing:.2em;text-transform:uppercase;color:var(--soft);padding-bottom:6px}
 .rate .val{
   font-size:46px;line-height:.72;letter-spacing:-.045em;
   font-variation-settings:"wdth" 66,"wght" 900;font-variant-numeric:tabular-nums;
   /* yükseklik baştan ayrıldı: puan verilince satır zıplamasın */
   height:33px;display:flex;align-items:flex-end;justify-content:flex-end;
 }
-.rate .val.empty{font-size:11px;font-weight:800;letter-spacing:.2em;color:var(--faint);line-height:1}
+.rate .val.empty{font-size:11px;font-weight:800;letter-spacing:.2em;color:var(--soft);line-height:1}
 
 /* Kaydırıcı · karar 48: 4px ray + blok topuz.
    Önceki hâli kenarlıklı kutuydu ve karar 48 tam onu eledi
@@ -194,7 +200,7 @@ body{
    space-between kullanınca "01" ile ilk çentik 8px kayıyordu. */
 .scale{
   position:relative;height:11px;margin-top:6px;
-  font-size:9px;font-weight:700;letter-spacing:.14em;color:var(--faint);
+  font-size:9px;font-weight:700;letter-spacing:.14em;color:var(--soft);
   font-variant-numeric:tabular-nums;
 }
 .scale span{position:absolute;transform:translateX(-50%);

@@ -26,6 +26,12 @@
   --ink:#EDEDEA;
   --dim:rgba(237,237,234,.58);
   --faint:rgba(237,237,234,.30);
+  /* Metin tonu tabani. --faint (0,30) zeminden 2,38:1 veriyordu, yani ne 4,5:1
+     metin esigini ne 3:1 grafik esigini geciyordu; structure-check turunda
+     bes prototipte 71 kullanimi olcuyle yakalandi. Uc basamagin ucu de artik
+     esigi geciyor: ink 16,87 / dim 6,01 / soft 4,50.
+     --faint duruyor ama yalniz DEKORATIF yuzeylerde (cizgi, cerceve, centik). */
+  --soft:rgba(237,237,234,.49);
   --rule:rgba(237,237,234,.18);
   --grain:.045;
   --pad:18px;
@@ -49,7 +55,7 @@ body{background:#050506;color:var(--ink);font-family:"Archivo",system-ui,sans-se
 }
 .tools button.on{background:var(--ink);color:var(--paper);border-color:var(--ink)}
 .tools .lbl{font-size:9px;font-weight:800;letter-spacing:.18em;text-transform:uppercase;
-  color:var(--faint);align-self:center;margin-right:2px}
+  color:var(--soft);align-self:center;margin-right:2px}
 .note{max-width:390px;padding:0 14px;font-size:11px;line-height:1.6;color:var(--dim)}
 
 .device{
@@ -69,9 +75,9 @@ body{background:#050506;color:var(--ink);font-family:"Archivo",system-ui,sans-se
 .scroll::-webkit-scrollbar{display:none}
 
 /* ---------- künye şeridi ---------- */
-.mast{display:flex;align-items:center;gap:9px;font-size:10px;font-weight:800;
-  letter-spacing:.2em;text-transform:uppercase;color:var(--faint)}
-.mast .r{margin-left:auto;letter-spacing:.16em}
+.mast{display:flex;align-items:center;gap:9px;font-size:11px;font-weight:800;
+  letter-spacing:.2em;text-transform:uppercase;color:var(--soft)}
+.mast .r{margin-left:auto;letter-spacing:.2em}
 /* Karar 75: Ikonate taban, gömülü round uçlar CSS ile keskine çevriliyor. */
 .mast .ic svg{display:block;width:14px;height:14px}
 .mast .ic svg *{stroke-linecap:butt;stroke-linejoin:miter}
@@ -82,7 +88,7 @@ body{background:#050506;color:var(--ink);font-family:"Archivo",system-ui,sans-se
 .head h1{margin-top:18px;font-size:30px;line-height:.86;letter-spacing:-.035em;
   text-transform:uppercase;font-variation-settings:"wdth" 70,"wght" 900}
 .head .meta{display:flex;gap:9px;margin-top:14px;font-size:11px;font-weight:800;
-  letter-spacing:.04em;text-transform:uppercase;color:var(--faint);
+  letter-spacing:.04em;text-transform:none;color:var(--soft);
   font-variant-numeric:tabular-nums}
 
 /* ---------- başlık hiyerarşisi: üç seviye ----------
@@ -105,20 +111,20 @@ body{background:#050506;color:var(--ink);font-family:"Archivo",system-ui,sans-se
 .sec{margin-top:30px;border-top:4px solid var(--ink);padding-top:12px;padding-bottom:13px;
   font-size:13px;font-weight:900;letter-spacing:.16em;
   text-transform:uppercase;color:var(--ink);display:flex;align-items:baseline}
-.sec span{margin-left:auto;font-size:11px;font-weight:800;letter-spacing:.04em;
-  color:var(--faint);font-variant-numeric:tabular-nums}
+.sec span{margin-left:auto;font-size:11px;font-weight:800;letter-spacing:.04em;text-transform:none;
+  color:var(--soft);font-variant-numeric:tabular-nums}
 
 /* ---------- ödül: kareye ait ---------- */
 /* Karar 43: ödül karesi DEĞERLENDİRİLEN yüzey, kırpılmaz. Kendi oranında duruyor,
    etrafındaki boşluk karar 64 ile zaten kabul edilmiş durumda. */
 .award{margin-top:18px}
 .award .lab{font-size:11px;font-weight:800;letter-spacing:.2em;text-transform:uppercase;
-  color:var(--faint);padding-bottom:11px}
+  color:var(--soft);padding-bottom:11px}
 .award img{width:100%;height:auto;display:block;background:#17171A}
 /* ters çevrilmiş damga şeridi: tema adı küçük, kazanan iri, ortalama sağda */
 .award .strip{background:var(--ink);color:var(--paper);padding:13px 13px 14px}
 .award .strip .ust{display:flex;align-items:baseline;gap:10px}
-.award .strip b{font-size:8.5px;font-weight:800;letter-spacing:.2em;text-transform:uppercase;
+.award .strip b{font-size:11px;font-weight:800;letter-spacing:.2em;text-transform:uppercase;
   opacity:.62;flex:0 0 auto}
 .award .strip .nm{font-size:15px;font-weight:900;text-transform:uppercase;letter-spacing:.01em;
   line-height:1.15;font-variation-settings:"wdth" 76,"wght" 900;min-width:0}
@@ -132,11 +138,11 @@ body{background:#050506;color:var(--ink);font-family:"Archivo",system-ui,sans-se
    söylemiyordu, "puan" kelimesi eklendi. */
 .award .strip .neden{margin-top:12px;padding-top:11px;
   border-top:1px solid rgba(10,10,11,.22)}
-.award .strip .neden b{display:block;font-size:9.5px;font-weight:800;
+.award .strip .neden b{display:block;font-size:11px;font-weight:800;
   letter-spacing:.2em;text-transform:uppercase;opacity:.55}
-.award .strip .neden p{margin-top:7px;font-size:12px;font-weight:800;
-  letter-spacing:.01em;line-height:1.45;font-variant-numeric:tabular-nums}
-.award .strip .neden em{font-style:normal;font-size:15px;
+.award .strip .neden p{margin-top:7px;font-size:11px;font-weight:800;
+  letter-spacing:.04em;line-height:1.45;font-variant-numeric:tabular-nums}
+.award .strip .neden em{font-style:normal;font-size:17px;
   font-variation-settings:"wdth" 72,"wght" 900}
 
 /* ---------- kürsü: 2. ve 3. (karar 65) ---------- */
@@ -152,12 +158,12 @@ body{background:#050506;color:var(--ink);font-family:"Archivo",system-ui,sans-se
 .podium img{width:100%;height:104px;object-fit:cover;display:block;background:#17171A}
 .podium figcaption{margin-top:10px}
 .podium .sat{display:flex;align-items:baseline;gap:8px}
-.podium .no{font-size:11px;line-height:1;color:var(--faint);flex:0 0 auto;
-  font-variation-settings:"wdth" 68,"wght" 900;font-variant-numeric:tabular-nums}
-.podium .nm{font-size:12px;font-weight:900;text-transform:uppercase;letter-spacing:.01em;
+.podium .no{font-size:11px;line-height:1;color:var(--soft);flex:0 0 auto;
+  font-variation-settings:"wdth" 68,"wght" 800;font-variant-numeric:tabular-nums}
+.podium .nm{font-size:12.5px;font-weight:900;text-transform:uppercase;letter-spacing:.01em;
   line-height:1.2;min-width:0;overflow-wrap:anywhere}
-.podium .av{display:block;margin-top:5px;font-size:15px;color:var(--dim);
-  letter-spacing:-.01em;font-variation-settings:"wdth" 72,"wght" 900;
+.podium .av{display:block;margin-top:5px;font-size:17px;color:var(--dim);
+  letter-spacing:-.02em;font-variation-settings:"wdth" 72,"wght" 900;
   font-variant-numeric:tabular-nums}
 
 /* ---------- ödül: kişiye ait ---------- */
@@ -165,27 +171,27 @@ body{background:#050506;color:var(--ink);font-family:"Archivo",system-ui,sans-se
    kişiye ait ödüller bu yüzden kareye ait olanlardan farklı görünüyor. */
 .people{display:flex;gap:8px;margin-top:12px}
 .people .box{flex:1;min-width:0;border:1px solid var(--rule);padding:11px 11px 12px}
-.people .box b{display:block;font-size:8px;font-weight:800;letter-spacing:.2em;
-  text-transform:uppercase;color:var(--faint)}
-.people .box .nm{display:block;margin-top:7px;font-size:13px;font-weight:900;
+.people .box b{display:block;font-size:11px;font-weight:800;letter-spacing:.2em;
+  text-transform:uppercase;color:var(--soft)}
+.people .box .nm{display:block;margin-top:7px;font-size:12.5px;font-weight:900;
   text-transform:uppercase;letter-spacing:.01em;line-height:1.2;overflow-wrap:anywhere}
 /* Karar 55: Müdavim çoğul ve tabansız, önce sayıyı söyler sonra isimleri döker.
    Bu yüzden yan yana iki eşit kutu olamıyor; 14 isim yarım genişliğe sığmaz.
    Spec'ten sapma, gerekçesi karar 55. */
 .mud{margin-top:10px;border:1px solid var(--rule);padding:14px 13px 15px}
 /* Seviye 2: ödül etiketiyle aynı giyinir (8,5px / .24em / sönük). */
-.mud b{font-size:11px;font-weight:800;letter-spacing:.2em;text-transform:uppercase;color:var(--faint)}
-.mud .cnt{margin-left:8px;font-size:13px;letter-spacing:.02em;
-  font-variation-settings:"wdth" 72,"wght" 900;font-variant-numeric:tabular-nums}
+.mud b{font-size:11px;font-weight:800;letter-spacing:.2em;text-transform:uppercase;color:var(--soft)}
+.mud .cnt{margin-left:8px;font-size:11px;font-weight:800;letter-spacing:.04em;
+  font-variation-settings:"wdth" 72,"wght" 800;font-variant-numeric:tabular-nums}
 /* Her isim aynı kutuyu alıyor, sadece dolgusu farklı. Önceden yalnız yeşil çipin
    padding'i vardı, o yüzden çipin bulunduğu satır diğerlerinden yüksek kalıyordu.
    Blok soldan -7px kaydırılıyor ki ilk isim MÜDAVİM etiketiyle hizalı dursun. */
 .mud .names{margin-top:10px;margin-left:-7px;display:flex;flex-wrap:wrap;gap:4px 0;
-  font-size:10.5px;font-weight:800;letter-spacing:.02em;color:var(--dim);text-transform:uppercase}
+  font-size:11px;font-weight:800;letter-spacing:.04em;color:var(--dim);text-transform:none}
 .mud .names span{padding:3px 7px;border-radius:2px;line-height:1.35}
 .mud .names .me{background:var(--me);color:var(--ink)}
 /* Tek kazananlı kişi ödülü (En çok yükselen) aynı kutuyu kullanıyor ama isim iri. */
-.mud .names .tek{font-size:13px;font-weight:900;color:var(--ink);letter-spacing:.01em}
+.mud .names .tek{font-size:12.5px;font-weight:900;color:var(--ink);letter-spacing:.01em;text-transform:uppercase}
 
 /* ---------- tema sekmeleri ---------- */
 /* Karar 61 sekme şeridini açıkça KESKİN listesine koyuyor, yuvarlaklık yok.
@@ -196,25 +202,25 @@ body{background:#050506;color:var(--ink);font-family:"Archivo",system-ui,sans-se
   margin-top:30px;padding-top:10px;padding-bottom:2px;display:flex}
 .tabs button{
   appearance:none;flex:1;min-width:0;background:transparent;border:0;
-  border-top:4px solid var(--rule);color:var(--faint);font:inherit;
-  font-size:11px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;
+  border-top:4px solid var(--rule);color:var(--soft);font:inherit;
+  font-size:11px;font-weight:800;letter-spacing:.2em;text-transform:uppercase;
   padding:14px 4px 15px;cursor:pointer;border-radius:0;
 }
 .tabs button.on{background:var(--ink);color:var(--paper);border-top-color:var(--ink)}
-.tabs button i{display:block;font-style:normal;margin-top:5px;font-size:9.5px;
-  letter-spacing:.04em;opacity:.6;font-variant-numeric:tabular-nums}
+.tabs button i{display:block;font-style:normal;margin-top:5px;font-size:11px;font-weight:800;
+  letter-spacing:.04em;text-transform:none;opacity:.6;font-variant-numeric:tabular-nums}
 
 /* ---------- galeri: sıralı liste ---------- */
 /* Karar 65: bu liste DÜZ. 1-2-3 burada ayrışmıyor, ayrım ödüller bölümündeki
    kürsüde yapılıyor. Beş satır da aynı biçimde. */
 .row{border-top:1px solid var(--rule);min-height:56px;display:flex;align-items:center;
   gap:12px;padding:9px 0}
-.row .no{font-size:15px;line-height:1;color:var(--faint);width:15px;flex:0 0 auto;
-  font-variation-settings:"wdth" 68,"wght" 900;font-variant-numeric:tabular-nums}
+.row .no{font-size:11px;line-height:1;color:var(--soft);width:15px;flex:0 0 auto;
+  font-variation-settings:"wdth" 68,"wght" 800;font-variant-numeric:tabular-nums}
 .row img{width:44px;height:44px;object-fit:cover;flex:0 0 auto;background:#17171A;display:block}
 .row .nm{font-size:12.5px;font-weight:900;text-transform:uppercase;letter-spacing:.01em;
   line-height:1.2;min-width:0;overflow-wrap:anywhere}
-.row .av{margin-left:auto;font-size:16px;letter-spacing:-.02em;flex:0 0 auto;
+.row .av{margin-left:auto;font-size:17px;letter-spacing:-.02em;flex:0 0 auto;
   font-variation-settings:"wdth" 72,"wght" 900;font-variant-numeric:tabular-nums}
 /* Karar 59: kendi satırın soldan 3px yeşil kenar */
 .row.me{box-shadow:inset 3px 0 0 var(--me);padding-left:9px}
@@ -229,8 +235,8 @@ body{background:#050506;color:var(--ink);font-family:"Archivo",system-ui,sans-se
 .grid figure.me img{outline:3px solid var(--me);outline-offset:-3px}
 .grid figure{cursor:pointer}
 .row{cursor:pointer}
-.grid figcaption{margin-top:8px;font-size:9.5px;font-weight:800;letter-spacing:.02em;
-  text-transform:uppercase;color:var(--dim);line-height:1.25;overflow-wrap:anywhere}
+.grid figcaption{margin-top:8px;font-size:11px;font-weight:800;letter-spacing:.04em;
+  text-transform:none;color:var(--dim);line-height:1.25;overflow-wrap:anywhere}
 
 /* ---------- fotoğraf detayı ---------- */
 .detay .shot{margin-top:12px}
@@ -239,11 +245,11 @@ body{background:#050506;color:var(--ink);font-family:"Archivo",system-ui,sans-se
 /* Karar 79, seviye 2: sayfadaki öğe etiketleriyle aynı (11px / .2em / sönük).
    Önce 8,5px idi, yani aynı dosyada iki farklı başlık dili vardı. */
 .detay .by b{font-size:11px;font-weight:800;letter-spacing:.2em;text-transform:uppercase;
-  color:var(--faint);flex:0 0 auto}
+  color:var(--soft);flex:0 0 auto}
 /* Sıralamaya girmeyen karede puanın neden yokluğunu söyleyen satır.
    Seviye 3: veri gibi giyiniyor, başlık gibi değil. */
-.detay .kural{margin-top:10px;font-size:11px;font-weight:800;letter-spacing:.02em;
-  color:var(--faint);line-height:1.5}
+.detay .kural{margin-top:10px;font-size:11px;font-weight:800;letter-spacing:.04em;
+  color:var(--soft);line-height:1.5}
 .mast .geri{appearance:none;background:transparent;border:0;padding:0;cursor:pointer;
   color:inherit;display:flex;align-items:center}
 .detay .by .nm{font-size:17px;font-weight:900;text-transform:uppercase;letter-spacing:.01em;
@@ -257,20 +263,20 @@ body{background:#050506;color:var(--ink);font-family:"Archivo",system-ui,sans-se
 .exif div{border-bottom:1px solid var(--rule);padding:9px 0 8px;display:flex;align-items:baseline;gap:8px}
 /* Karar 79, seviye 2. Künye etiketleri de 8px'ten çıktı. */
 .exif b{font-size:11px;font-weight:800;letter-spacing:.2em;text-transform:uppercase;
-  color:var(--faint);flex:0 0 auto}
-.exif span{margin-left:auto;font-size:11.5px;font-weight:800;letter-spacing:.02em;
+  color:var(--soft);flex:0 0 auto}
+.exif span{margin-left:auto;font-size:11px;font-weight:800;letter-spacing:.04em;
   font-variant-numeric:tabular-nums;text-align:right}
 
 /* oylama sürerken: kapalı künye. Ekran boş bırakılmıyor (karar 24). */
 .kapali{margin-top:14px;border:1px dashed var(--rule);padding:13px 12px;
   font-size:11px;line-height:1.6;color:var(--dim)}
 .kapali b{display:block;font-size:11px;font-weight:800;letter-spacing:.2em;
-  text-transform:uppercase;color:var(--faint);margin-bottom:8px}
+  text-transform:uppercase;color:var(--soft);margin-bottom:8px}
 /* Kendi puanın görünür (karar 38), sıra HİÇBİR ZAMAN görünmez. */
 .benim{margin-top:12px;border-top:1px solid var(--rule);padding-top:11px;
   display:flex;align-items:baseline;gap:10px}
 .benim b{font-size:11px;font-weight:800;letter-spacing:.2em;text-transform:uppercase;
-  color:var(--faint)}
+  color:var(--soft)}
 .benim .av{margin-left:auto;font-size:17px;letter-spacing:-.02em;
   font-variation-settings:"wdth" 72,"wght" 900;font-variant-numeric:tabular-nums}
 
