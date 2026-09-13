@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,maximum-scale=1">
+<title>Creatographers · yönetim</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&display=swap" rel="stylesheet">
+<style>
+/* ==========================================================
+   Parça 5 · Yönetim
+   Yöneticinin işi dağınık hâlde zaten karara bağlanmıştı; bu parça
+   onları bir araya getiriyor, yeni kural icat etmiyor:
+   karar 2 (davetli liste), 26 (etkinlik ve tarihler, aşamayı elle
+   çevirme), 29 (çekim şartı), 32/33 (pencere süreleri), 35 (kopyalanan
+   mesaj), 72 (en fazla 3 tema), 81/82 (havuzdan tema seçimi).
+
+   Yerleşim: yönetim Profil'in içinde, yalnız yöneticiye görünen bir blok.
+   Dördüncü sekme karar 45'i ("üç sekme kaldı") bozardı; karar 58 zaten
+   ayarları kendi profiline koyuyor.
+   ========================================================== */
+:root{
+  --paper:#0A0A0B; --ink:#EDEDEA;
+  --dim:rgba(237,237,234,.58);
+  --soft:rgba(237,237,234,.49);
+  --faint:rgba(237,237,234,.30);
+  --rule:rgba(237,237,234,.18);
+  --grain:.045; --pad:18px;
+  --me:#0C6E4A;                 /* safelight yeşili: seçili/onaylı */
+  --yukle:#B52D12;              /* yağlı kalem: yükleme aşaması (karar 47) */
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{background:#050506;color:var(--ink);font-family:"Archivo",system-ui,sans-serif;
+  display:flex;flex-direction:column;align-items:center;gap:14px;padding:18px 0;overflow:auto}
+
+.tools{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;max-width:470px;padding:0 12px}
+.tools button{appearance:none;border:1px solid var(--rule);background:transparent;color:var(--dim);
+  font:inherit;font-size:9.5px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;
+  padding:8px 11px;cursor:pointer;border-radius:2px}
+.tools button.on{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.tools .lbl{font-size:9px;font-weight:800;letter-spacing:.18em;text-transform:uppercase;
+  color:var(--faint);align-self:center;margin-right:2px}
+.note{max-width:390px;padding:0 14px;font-size:11px;line-height:1.6;color:var(--dim)}
+
+.device{width:min(390px,100vw);height:844px;max-height:calc(100dvh - 92px);
+  position:relative;overflow:hidden;background:var(--paper);
+  border:1px solid var(--rule);display:flex;flex-direction:column;flex:0 0 auto}
+.device::after{content:'';position:absolute;inset:0;z-index:30;pointer-events:none;opacity:var(--grain);
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E")}
+.scroll{flex:1;min-height:0;overflow-y:auto;padding:0 var(--pad) 28px;scrollbar-width:none}
+.scroll::-webkit-scrollbar{display:none}
+.scroll > .mast{margin-top:16px}
+
+/* ---- ölçek, karar 79 ---- */
+.mast{display:flex;align-items:center;font-size:11px;font-weight:800;letter-spacing:.2em;
+  text-transform:uppercase;color:var(--soft)}
+.mast .r{margin-left:auto}
+.rb{height:4px;background:var(--ink);margin-top:8px}
+.sec{margin-top:26px;border-top:4px solid var(--ink);padding:12px 0;
+  font-size:13px;font-weight:900;letter-spacing:.16em;text-transform:uppercase;color:var(--ink);
+  display:flex;align-items:baseline}
+.sec span{margin-left:auto;font-size:11px;font-weight:800;letter-spacing:.04em;
+  text-transform:none;color:var(--soft);font-variant-numeric:tabular-nums}
+.lab{font-size:11px;font-weight:800;letter-spacing:.2em;text-transform:uppercase;color:var(--soft)}
+.veri{font-size:11px;font-weight:800;letter-spacing:.04em;color:var(--soft);line-height:1.6}
+
+/* ---- profil içindeki yönetim girişi ---- */
+.rol{margin-top:18px;border:1px solid var(--rule);padding:15px}
+.rol h3{margin-top:9px;font-size:15px;font-weight:900;text-transform:uppercase;letter-spacing:.01em;
+  font-variation-settings:"wdth" 76,"wght" 900}
+.rol p{margin-top:9px}
+.rol .act{margin-top:14px;height:48px;display:flex;align-items:center;justify-content:center;
+  box-shadow:inset 0 0 0 2px var(--ink);border-radius:2px;cursor:pointer;
+  font-size:11px;font-weight:800;letter-spacing:.2em;text-transform:uppercase}
+
+/* ---- havuzdan tema seçimi ---- */
+.oneri{border-top:1px solid var(--rule);padding:14px 0 15px;cursor:pointer;display:flex;gap:12px}
+.oneri .kutu{width:22px;height:22px;flex:0 0 auto;margin-top:2px;border-radius:2px;
+  box-shadow:inset 0 0 0 2px var(--soft)}
+.oneri.secili .kutu{background:var(--me);box-shadow:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23EDEDEA' stroke-width='3'%3E%3Cpath d='M5 13l4 4L19 7'/%3E%3C/svg%3E");
+  background-size:16px;background-position:center;background-repeat:no-repeat}
+.oneri .gov{min-width:0;flex:1}
+.oneri .ad{font-size:12.5px;font-weight:900;text-transform:uppercase;letter-spacing:.01em}
+.oneri .neden{margin-top:6px;font-size:11px;font-weight:800;letter-spacing:.04em;
+  color:var(--soft);line-height:1.55}
+.oneri .kim{margin-top:6px;font-size:11px;font-weight:800;letter-spacing:.04em;color:var(--soft)}
+.sayac{margin-top:16px;padding-top:13px;border-top:4px solid var(--ink);
+  display:flex;align-items:baseline;gap:10px}
+.sayac b{font-size:11px;font-weight:800;letter-spacing:.2em;text-transform:uppercase;color:var(--soft)}
+.sayac .v{margin-left:auto;font-size:17px;letter-spacing:-.02em;
+  font-variation-settings:"wdth" 72,"wght" 900;font-variant-numeric:tabular-nums}
+.uyari{margin-top:12px;border:1px dashed var(--rule);padding:12px 13px;
+  font-size:11px;font-weight:800;letter-spacing:.04em;color:var(--soft);line-height:1.55}
+
+/* ---- ayar satırı (süre, çekim şartı) ---- */
+.ayar{border-top:1px solid var(--rule);padding:14px 0;display:flex;align-items:center;gap:12px}
+.ayar .tx{min-width:0;flex:1}
+.ayar .tx b{display:block;font-size:12.5px;font-weight:900;text-transform:uppercase;letter-spacing:.01em}
+.ayar .tx span{display:block;margin-top:5px;font-size:11px;font-weight:800;letter-spacing:.04em;
+  color:var(--soft);line-height:1.5}
+.ayar .deg{flex:0 0 auto;min-width:78px;height:44px;display:flex;align-items:center;justify-content:center;
+  box-shadow:inset 0 0 0 1px var(--rule);border-radius:2px;cursor:pointer;
+  font-size:11px;font-weight:800;letter-spacing:.04em;font-variant-numeric:tabular-nums}
+.ikili{display:flex;gap:8px;margin-top:10px}
+.ikili button{flex:1;appearance:none;border:0;cursor:pointer;height:44px;border-radius:2px;
+  background:transparent;box-shadow:inset 0 0 0 1px var(--rule);color:var(--soft);font:inherit;
+  font-size:11px;font-weight:800;letter-spacing:.2em;text-transform:uppercase}
+.ikili button.on{background:var(--me);color:var(--ink);box-shadow:none}
+
+/* ---- aşama kontrolü ---- */
+.asama{margin-top:18px;border:1px solid var(--rule);padding:15px}
+.asama .simdi{display:flex;align-items:baseline;gap:10px}
+.asama .nokta{width:10px;height:10px;border-radius:50%;background:var(--yukle);flex:0 0 auto}
+.asama .ad{font-size:15px;font-weight:900;text-transform:uppercase;letter-spacing:.01em;
+  font-variation-settings:"wdth" 76,"wght" 900}
+.asama .kalan{margin-left:auto;font-size:17px;letter-spacing:-.02em;
+  font-variation-settings:"wdth" 72,"wght" 900;font-variant-numeric:tabular-nums}
+
+/* ---- kopyalanan mesaj, karar 35 ---- */
+.mesaj{margin-top:16px;background:var(--ink);color:var(--paper);padding:14px 14px 15px}
+.mesaj b{display:block;font-size:11px;font-weight:800;letter-spacing:.2em;
+  text-transform:uppercase;opacity:.55}
+.mesaj p{margin-top:10px;font-size:12.5px;font-weight:800;letter-spacing:.01em;line-height:1.55}
+.mesaj .kopya{margin-top:13px;height:44px;display:flex;align-items:center;justify-content:center;
+  box-shadow:inset 0 0 0 2px var(--paper);border-radius:2px;cursor:pointer;
+  font-size:11px;font-weight:800;letter-spacing:.2em;text-transform:uppercase}
+
+/* ---- üye satırı ---- */
+.uye{border-top:1px solid var(--rule);padding:13px 0;display:flex;align-items:center;gap:11px}
+.uye .tx{min-width:0;flex:1}
+.uye .tx b{display:block;font-size:12.5px;font-weight:900;text-transform:uppercase;letter-spacing:.01em}
+.uye .tx span{display:block;margin-top:4px;font-size:11px;font-weight:800;letter-spacing:.04em;
+  color:var(--soft);text-transform:none}
+.uye .rozet{flex:0 0 auto;font-size:11px;font-weight:800;letter-spacing:.2em;
+  text-transform:uppercase;color:var(--soft)}
+.uye .rozet.bekliyor{background:var(--yukle);color:var(--ink);padding:3px 8px;border-radius:2px}
+
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{transition-duration:.001ms!important}}
+</style>
+</head>
+<body>
+
+<div class="tools" id="tools">
+  <span class="lbl">Ekran</span>
+  <button data-s="giris" class="on">Profil · yönetim</button>
+  <button data-s="temalar">Havuzdan tema seç</button>
+  <button data-s="kur">Etkinliği kur</button>
+  <button data-s="asama">Aşama kontrolü</button>
+  <button data-s="uyeler">Üyeler</button>
+</div>
+<p class="note" id="note"></p>
+
+<div class="device"><div class="scroll" id="scroll"></div></div>
+
+<script>
+const KUNYE = `<div class="mast"><span>Creatographers</span><span class="r">Yönetim</span></div>
+  <div class="rb"></div>`;
+
+/* Karar 82: havuz sürekli, kişi başı bir açık öneri, seçilmeyen havuzda kalır.
+   Bu yüzden listede eski öneriler de var ve "kaç etkinliktir bekliyor" yazıyor. */
+const HAVUZ = [
+  {ad:'Gece', neden:'Karanlıkta uzun pozlama denemek istiyorum.', kim:'Selin Arı', bekleyen:0},
+  {ad:'Islak zemin', neden:'Yağmurdan sonra yansımalar.', kim:'Mert Demir', bekleyen:2},
+  {ad:'Kalabalık', neden:'', kim:'Can Öz', bekleyen:1},
+  {ad:'Pencere', neden:'İçeriden dışarı bakan kareler.', kim:'Ayşe Kaya', bekleyen:3},
+  {ad:'Eller', neden:'Yakın plan, sadece eller.', kim:'Ece Tan', bekleyen:0},
+  {ad:'Tek renk', neden:'Karede tek bir rengin baskın olması.', kim:'Barış Ak', bekleyen:1},
+];
+let secili = new Set(['Gece','Eller']);
+
+const EKRAN = {
+
+  giris: {
+    not:'Yönetim Profil\'in içinde, yalnız yöneticiye görünen bir blok. Dördüncü sekme karar 45\'i ("üç sekme kaldı") bozardı; karar 58 zaten ayarları kendi profiline koyuyor.',
+    ciz: () => KUNYE + `
+      <div class="sec">Profilin<span>Ayşe Kaya</span></div>
+      <div class="rol">
+        <span class="lab">Rolün</span>
+        <h3>Kulüp yöneticisi</h3>
+        <p class="veri">Etkinliği ve tarihleri sen kuruyorsun, temaları havuzdan seçiyorsun,
+           aşamaları gerektiğinde elle çevirebiliyorsun.</p>
+        <div class="act" data-git="temalar">Yönetim</div>
+      </div>
+      <div class="sec">Bekleyen<span>2 iş</span></div>
+      <div class="ayar" data-git="temalar">
+        <div class="tx"><b>Havuzda 6 öneri var</b>
+          <span>Ocak etkinliği için tema seçilmedi</span></div>
+        <div class="deg">Aç</div>
+      </div>
+      <div class="ayar" data-git="uyeler">
+        <div class="tx"><b>1 üye onay bekliyor</b>
+          <span>Davetli listeye eklenmeyi bekliyor</span></div>
+        <div class="deg">Aç</div>
+      </div>`
+  },
+
+  temalar: {
+    not:'Karar 82: havuz yalnız burada görünüyor, kulüp göremiyor. Seçilmeyen öneri düşmüyor, "kaç etkinliktir bekliyor" sayacıyla duruyor. Karar 72 en fazla 3 tema diyor, sayaç onu takip ediyor.',
+    ciz: () => KUNYE + `
+      <div class="sec">Havuz<span>${HAVUZ.length} öneri</span></div>
+      ${HAVUZ.map(o => `
+        <div class="oneri ${secili.has(o.ad)?'secili':''}" data-sec="${o.ad}">
+          <span class="kutu"></span>
+          <div class="gov">
+            <div class="ad">${o.ad}</div>
+            ${o.neden ? `<div class="neden">${o.neden}</div>` : ''}
+            <div class="kim">${o.kim}${o.bekleyen ? ` · ${o.bekleyen} etkinliktir havuzda` : ' · yeni'}</div>
+          </div>
+        </div>`).join('')}
+      <div class="sayac">
+        <b>Seçilen</b><span class="v">${secili.size} / 3</span>
+      </div>
+      ${secili.size > 3 ? `<div class="uyari">Bir etkinlik en fazla 3 tema alıyor (karar 72). Seçimini azalt.</div>` : ''}
+      ${secili.size === 0 ? `<div class="uyari">Etkinliği kurmak için en az bir tema seç.</div>` : ''}`
+  },
+
+  kur: {
+    not:'Kararlar 26, 29, 32 ve 33 burada birleşiyor. Süreler varsayılanıyla geliyor, yönetici değiştirebiliyor. Çekim şartı tema başına, çünkü karar 29 "karma" diyor.',
+    ciz: () => KUNYE + `
+      <div class="sec">Ocak etkinliği<span>06</span></div>
+      <div class="ayar">
+        <div class="tx"><b>Yükleme</b><span>Varsayılan 48 saat (karar 32)</span></div>
+        <div class="deg">48 sa</div>
+      </div>
+      <div class="ayar">
+        <div class="tx"><b>Oylama</b><span>Yüklemeden uzun, her kareye puan gerekiyor</span></div>
+        <div class="deg">72 sa</div>
+      </div>
+
+      <div class="sec">Çekim şartı<span>tema başına</span></div>
+      <div class="ayar">
+        <div class="tx"><b>Gece</b>
+          <span>Buluşmada çekilmek zorunda mı</span>
+          <div class="ikili"><button class="on">Buluşmada</button><button>Serbest</button></div>
+        </div>
+      </div>
+      <div class="ayar">
+        <div class="tx"><b>Eller</b>
+          <span>Buluşmada çekilmek zorunda mı</span>
+          <div class="ikili"><button>Buluşmada</button><button class="on">Serbest</button></div>
+        </div>
+      </div>`
+  },
+
+  asama: {
+    not:'Karar 26: aşamalar takvimle kendiliğinden ilerliyor, yönetici gerektiğinde elle çevirebiliyor. Karar 35: aşama açılınca hazır mesaj çıkıyor, tek dokunuşla kopyalanıyor, çünkü bildirim kanalı kulübün WhatsApp grubu.',
+    ciz: () => KUNYE + `
+      <div class="sec">Ocak etkinliği<span>06</span></div>
+      <div class="asama">
+        <div class="simdi">
+          <span class="nokta"></span>
+          <span class="ad">Yükleme açık</span>
+          <span class="kalan">31 sa</span>
+        </div>
+        <p class="veri" style="margin-top:11px">Takvime göre yarın 18:00'de oylamaya geçiyor.
+           Erken açabilir ya da uzatabilirsin.</p>
+        <div class="ikili">
+          <button>Uzat</button><button>Oylamayı aç</button>
+        </div>
+      </div>
+      <div class="mesaj">
+        <b>Gruba yazılacak</b>
+        <p>Ocak etkinliği başladı. İki tema var: Gece ve Eller. Kareleri yarın 18:00'e
+           kadar yükleyin, sonra oylama açılıyor.</p>
+        <div class="kopya">Kopyala</div>
+      </div>
+      <div class="uyari">Mesaj otomatik gitmiyor, uygulama içi bildirim yok (karar 35).
+        Kopyalayıp gruba sen yapıştırıyorsun.</div>`
+  },
+
+  uyeler: {
+    not:'Karar 2: davetli liste. Yönetici e-posta adreslerini onaylıyor, sadece o adresler Google ile girebiliyor.',
+    ciz: () => KUNYE + `
+      <div class="sec">Üyeler<span>20 üye</span></div>
+      <div class="uye">
+        <div class="tx"><b>Deniz Akın</b><span>deniz.akin@example.com</span></div>
+        <span class="rozet bekliyor">Bekliyor</span>
+      </div>
+      <div class="uye">
+        <div class="tx"><b>Ayşe Kaya</b><span>ayse@example.com · yönetici</span></div>
+        <span class="rozet">Üye</span>
+      </div>
+      <div class="uye">
+        <div class="tx"><b>Mert Demir</b><span>mert@example.com</span></div>
+        <span class="rozet">Üye</span>
+      </div>
+      <div class="uye">
+        <div class="tx"><b>Selin Arı</b><span>selin@example.com</span></div>
+        <span class="rozet">Üye</span>
+      </div>
+      <div class="uye">
+        <div class="tx"><b>Can Öz</b><span>can@example.com</span></div>
+        <span class="rozet">Üye</span>
+      </div>
+      <div class="uyari">Etkinliğe katılmayan üyeler de oylayabiliyor (karar 2).</div>`
+  },
+};
+
+function goster(ad){
+  const sc = document.getElementById('scroll');
+  sc.innerHTML = EKRAN[ad].ciz();
+  document.getElementById('note').textContent = EKRAN[ad].not;
+  sc.scrollTop = 0;
+  document.querySelectorAll('.tools button').forEach(b => b.classList.toggle('on', b.dataset.s === ad));
+  sc.dataset.ekran = ad;
+}
+document.getElementById('tools').addEventListener('click', e => {
+  const b = e.target.closest('button'); if (b) goster(b.dataset.s);
+});
+document.getElementById('scroll').addEventListener('click', e => {
+  const sc = document.getElementById('scroll');
+  const g = e.target.closest('[data-git]');
+  if (g) return goster(g.dataset.git);
+  /* Tema seçimi gerçekten çalışıyor: sayaç ve uyarı buna bağlı. */
+  const o = e.target.closest('[data-sec]');
+  if (o) {
+    const ad = o.dataset.sec;
+    secili.has(ad) ? secili.delete(ad) : secili.add(ad);
+    const y = sc.scrollTop; goster('temalar'); sc.scrollTop = y;
+  }
+});
+goster('giris');
+</script>
+</body>
+</html>
