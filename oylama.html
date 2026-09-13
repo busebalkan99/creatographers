@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,maximum-scale=1">
+<title>Creatographers · oylama (Provoke)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&display=swap" rel="stylesheet">
+<style>
+/* ==========================================================
+   Oylama · Provoke
+   Kırpma YOK. Fotoğraf her zaman tam, üstüne hiçbir şey binmez.
+   Boşluk boş bırakılmıyor: sayfa gibi kompoze ediliyor
+   (sıra numarası, künye, kalın ayraçlar) — fotokitap grameri.
+   Token'lar 2026-09-12_provoke-spec.md'den.
+   ========================================================== */
+:root{
+  --paper:#0A0A0B;
+  --ink:#EDEDEA;
+  --dim:rgba(237,237,234,.58);
+  --faint:rgba(237,237,234,.30);
+  --rule:rgba(237,237,234,.18);
+  --grain:.045;
+  --pad:16px;                 /* Apple HIG 16pt · Material 3 16dp */
+  /* Karar 47: oylama aşaması safelight yeşili (Kodak No.3, 510nm).
+     Vurgu YÜZEY rengi, metin rengi değil. Zeminden 3,2:1, üstünde açık metin 5,4:1.
+     DİKKAT: bu ekranda kullanılmıyor. Kaydırıcı mürekkebe çevrildi, bu ekranda
+     vurgu rengi taşıyan başka bir yüzey kalmadı. Token seti eksiksiz dursun diye
+     burada tanımlı; ilerleme çubuğu ya da geri sayım eklenirse oradan okunacak. */
+  --acc:#0C6E4A;
+  --ease:cubic-bezier(.32,.72,0,1);
+  /* Karar 60: iki katmanlı hale. Aynı sebeple bu ekranda kullanılmıyor. */
+  --glow:0 0 7px rgba(12,110,74,.7), 0 0 22px rgba(12,110,74,.34);
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{
+  background:#050506;color:var(--ink);
+  font-family:"Archivo",system-ui,sans-serif;
+  display:grid;place-items:center;overflow:hidden;
+}
+.device{
+  width:min(390px,100vw);height:min(844px,100dvh);
+  position:relative;overflow:hidden;background:var(--paper);
+  border:1px solid var(--rule);
+}
+@media (max-width:430px){ .device{width:100vw;height:100dvh;border:0} }
+
+/* gren, her şeyin üstünde */
+.device::after{
+  content:'';position:absolute;inset:0;z-index:30;pointer-events:none;opacity:var(--grain);
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+.feed{height:100%;overflow-y:scroll;scroll-snap-type:y mandatory;scrollbar-width:none;overscroll-behavior-y:contain}
+.feed::-webkit-scrollbar{display:none}
+.shot{
+  height:100%;scroll-snap-align:start;scroll-snap-stop:always;
+  display:flex;flex-direction:column;position:relative;
+  padding:calc(12px + env(safe-area-inset-top)) var(--pad) calc(14px + env(safe-area-inset-bottom));
+  touch-action:pan-y;
+}
+
+/* ---------- 1. künye satırı ---------- */
+.masthead{
+  flex:0 0 auto;display:flex;align-items:baseline;gap:10px;
+  font-size:9.5px;font-weight:800;letter-spacing:.22em;text-transform:uppercase;color:var(--faint);
+}
+.masthead .right{margin-left:auto;letter-spacing:.16em}
+
+/* kalın ayraç — katalogdan, 4px tam taşma */
+.rule-bold{flex:0 0 auto;height:4px;background:var(--ink);margin:9px 0 0}
+.rule-hair{flex:0 0 auto;height:1px;background:var(--rule)}
+
+/* ---------- 2. plaka bandı ---------- */
+.plate{
+  flex:0 0 auto;display:flex;align-items:flex-end;gap:12px;
+  padding:10px 0 11px;
+}
+.plate .no{
+  font-size:52px;line-height:.76;letter-spacing:-.04em;
+  font-variation-settings:"wdth" 68,"wght" 900;
+  font-variant-numeric:tabular-nums;
+}
+.plate .of{
+  font-size:10px;font-weight:800;letter-spacing:.16em;color:var(--faint);
+  text-transform:uppercase;padding-bottom:5px;
+}
+.plate .theme{
+  margin-left:auto;text-align:right;padding-bottom:4px;
+  font-size:15px;font-weight:900;letter-spacing:.01em;text-transform:uppercase;
+  font-variation-settings:"wdth" 74,"wght" 900;
+}
+.plate .theme small{
+  display:block;font-size:9px;font-weight:700;letter-spacing:.18em;
+  color:var(--faint);margin-top:3px;
+  font-variation-settings:"wdth" 100,"wght" 700;
+}
+
+/* ---------- 3. sahne: fotoğraf, ASLA kırpılmaz ---------- */
+.stage{
+  flex:1;min-height:0;padding:13px 6px;   /* nişan işaretleri 16px payı yemesin */
+  display:flex;align-items:center;justify-content:center;
+}
+/* sarmalayıcı: fotoğrafın gerçek sınırı. Nişan işaretleri buna yapışır,
+   ve max-height zinciri burada kesinleşir (yoksa uzun kareler taşıyor). */
+.holder{
+  position:relative;max-width:100%;max-height:100%;
+  display:flex;line-height:0;
+}
+.holder img{
+  display:block;max-width:100%;max-height:100%;width:auto;height:auto;
+  user-select:none;-webkit-user-drag:none;
+}
+/* nişan işaretleri: fotoğrafın köşelerinde, dışa taşar */
+.holder .reg{position:absolute;width:10px;height:10px;border:1px solid var(--faint);pointer-events:none}
+.holder .reg.tl{top:-6px;left:-6px;border-right:0;border-bottom:0}
+.holder .reg.tr{top:-6px;right:-6px;border-left:0;border-bottom:0}
+.holder .reg.bl{bottom:-6px;left:-6px;border-right:0;border-top:0}
+.holder .reg.br{bottom:-6px;right:-6px;border-left:0;border-top:0}
+
+
+/* ---------- 5. puan ---------- */
+.rate{flex:0 0 auto;padding-top:12px}
+.rate .row{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:11px}
+.rate .lab{font-size:10px;font-weight:800;letter-spacing:.2em;text-transform:uppercase;color:var(--faint);padding-bottom:6px}
+.rate .val{
+  font-size:46px;line-height:.72;letter-spacing:-.045em;
+  font-variation-settings:"wdth" 66,"wght" 900;font-variant-numeric:tabular-nums;
+  /* yükseklik baştan ayrıldı: puan verilince satır zıplamasın */
+  height:33px;display:flex;align-items:flex-end;justify-content:flex-end;
+}
+.rate .val.empty{font-size:11px;font-weight:800;letter-spacing:.2em;color:var(--faint);line-height:1}
+
+/* Kaydırıcı · karar 48: 4px ray + blok topuz.
+   Önceki hâli kenarlıklı kutuydu ve karar 48 tam onu eledi
+   ("slider hissi vermiyor, boş kutu gibi"). Bu, v14'teki A varyantı.
+   Karar 47: kaydırıcı bir vurgu YÜZEYİ, oylama aşamasında safelight yeşili.
+     Yüzey zeminden 3,2:1 ayrılıyor (grafik eşiği 3:1, geçer).
+   Karar 60: süren iş ışır. Işıma sürükleme boyunca var, parmak kalkınca söner.
+     Duran bir puan "süren iş" değil, o yüzden bırakınca ışık kapanıyor.
+   Karar 61: topuz mekanizma, 2px yuvarlak (35mm KS perforasyonu, kısa kenarın %6,4'ü).
+     Ray ve çentikler keskin kalıyor. */
+/* Topuz davranışı üç katman:
+   A · bastığında büyüyor (16x40 -> 22x48). Parmağın altındaki şeyin büyümesi "tuttum" diyor.
+   B · bıraktığında en yakın kademeye oturuyor ve o çentik kalınlaşıyor. NN/g'nin işaret
+       ettiği sorunu çözüyor: parmağı kaldırırken kaydırıcıyı itip değeri kaçırmak.
+   C · her kademede çentik anlık uzayıp parlıyor, diyafram halkasındaki tık gibi.
+   Dokunma alanı her hâlde rayın tamamı: 358x52px, önerilen 44x44'ün üstünde. */
+.slider{position:relative;height:52px;touch-action:none;cursor:grab;
+  --kw:16px;--kh:40px}
+.slider:active{cursor:grabbing}
+.slider.dragging{--kw:22px;--kh:48px}
+.rail2{position:absolute;left:0;right:0;top:50%;height:4px;background:var(--rule);
+  transform:translateY(-50%)}
+/* Kaydırıcı mürekkep, yeşil değil. Topuz ekrandaki en çok elleşilen öğe ve
+   mürekkep zeminden 15,6:1 ayrılıyor, yeşil 3,2:1 ayrılıyordu. Ayrıca fotoğrafın
+   renkleri kareden kareye değişirken mürekkep bu değişkenliğe bağışık.
+   Sonucu: karar 60'ın ışıması buradan kalktı, "mürekkep ışımaz". */
+.fill{position:absolute;left:0;top:50%;height:4px;background:var(--ink);
+  transform:translateY(-50%);
+  width:calc(var(--kw)/2 + var(--p,0) * (100% - var(--kw)))}
+.ticks{position:absolute;inset:0;pointer-events:none}
+.ticks i{position:absolute;top:50%;width:1px;height:11px;background:var(--faint);
+  transform:translate(-50%,-50%);transition:background .18s var(--ease),height .18s var(--ease)}
+/* Çentikler topuzdan UZUN olmak zorunda. 17-19px denendi ve hiç görünmedi:
+   topuz 40px, sürüklerken 48px ve tam aynı noktada duruyor, çentiği örtüyordu.
+   Yani B'nin oturma işareti de C'nin tıkı da görünmüyordu. Şimdi iki ucundan taşıyorlar. */
+.ticks i.hit{height:64px;background:var(--ink);transition:none}   /* C · kademe tıkı */
+.ticks i.at{height:56px;background:var(--ink)}                    /* B · oturduğu kademe */
+.knob{
+  position:absolute;top:50%;background:var(--ink);
+  width:var(--kw);height:var(--kh);
+  left:calc(var(--p,0) * (100% - var(--kw)));   /* left = sol kenar, merkez değil */
+  transform:translateY(-50%);border-radius:2px;
+  opacity:0;pointer-events:none;
+  /* left'te geçiş YOK: sürüklenirken topuz parmağın arkasında kalıyordu.
+     Geçiş sadece bırakınca oturma için, .settling'de veriliyor. */
+  transition:width .14s var(--ease),height .14s var(--ease);
+}
+.slider.settling .knob{transition:width .14s var(--ease),height .14s var(--ease),
+  left .22s var(--ease)}
+/* Tutamak çizgisi, topuzun zıddı. Topuz mürekkep olunca çizgi zorunlu olarak
+   koyuya döndü; beyaz topuzda beyaz çizgi görünmezdi. Koyu çizgi beyaz üstünde 15,6:1. */
+.knob::after{
+  content:'';position:absolute;left:50%;top:50%;width:1px;height:16px;
+  background:var(--paper);transform:translate(-50%,-50%);
+}
+.shot.scored .knob{opacity:1}
+/* Işıma yok: kaydırıcı mürekkep ve karar 60 mürekkebin ışımayacağını söylüyor.
+   .dragging sınıfı yine gerekli, topuzun büyümesini o tetikliyor. */
+/* Etiketler çentiklerin tam altına hizalanır: ray 8px içeriden başlıyor,
+   space-between kullanınca "01" ile ilk çentik 8px kayıyordu. */
+.scale{
+  position:relative;height:11px;margin-top:6px;
+  font-size:9px;font-weight:700;letter-spacing:.14em;color:var(--faint);
+  font-variant-numeric:tabular-nums;
+}
+.scale span{position:absolute;transform:translateX(-50%);
+  left:calc(8px + var(--t) * (100% - 16px))}
+
+/* ---------- bitiş ---------- */
+.done{
+  height:100%;scroll-snap-align:start;display:flex;flex-direction:column;
+  justify-content:center;gap:14px;padding:0 var(--pad);
+}
+.done h2{
+  font-size:58px;line-height:.82;letter-spacing:-.06em;text-transform:uppercase;
+  font-variation-settings:"wdth" 72,"wght" 900;
+  /* Sert 6ch sınırı kaldırıldı: "Kalabalık" gibi uzun bir tema adı kutudan taşıyordu.
+     Karar 50'nin mantığı, ad kesilmez, sarar. */
+  overflow-wrap:anywhere;
+}
+.done p{font-size:13px;color:var(--dim);line-height:1.6;letter-spacing:.02em;max-width:32ch}
+/* Eksik kareler ızgarası.
+   4px ayraç bölümü açıyor; metin özellikleri kaldırıldı, burada artık yazı yok.
+   Boyut SÜTUN SAYISIYLA ayarlanıyor, transform:scale ile değil. scale grid gözünü
+   büyütmüyor, sadece içeriği taşırıyor: ölçülen hâliyle 1 kare kutuyu 143px aşıyor,
+   2 kare komşusuyla 43px örtüşüyordu. Ayrıca idx'e bağlı ölçek aynı satırdaki
+   kareleri farklı boyutta yapıyordu. */
+.done .miss{
+  border-top:4px solid var(--ink);
+  padding-top:11px;margin-top:6px;
+  display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;
+}
+.miss-card{
+  appearance:none;border:1px solid var(--rule);background:rgba(237,237,234,.02);
+  color:var(--ink);position:relative;
+  width:100%;padding:0;cursor:pointer;overflow:hidden;
+  /* Yükseklik JS'ten piksel olarak veriliyor. height:100% düğme üstünde çözülmüyordu:
+     satır kutusu 176px iken kart 58px'te kalıyor ve ızgarada 173px boşluk bırakıyordu. */
+  /* Sabit oran yok: kart gözü tamamen dolduruyor, böylece ızgarada boşluk kalmıyor.
+     Karar 61: bu bir düğme ama görünen şey fotoğraf, o yüzden keskin kalıyor. */
+}
+.miss-card img{
+  display:block;width:100%;height:100%;object-fit:cover;
+}
+/* Künye ters çevrilmiş mürekkep blok. Önceki hâli fotoğrafın üstünde text-shadow'du;
+   gölge token setinde yok (--shadow:none) ve okunurluğu fotoğrafa bağlıydı.
+   Blok hâlinde paper üstü ink 15,6:1, fotoğraf ne olursa olsun okunuyor. */
+.miss-card .meta{
+  position:absolute;left:0;bottom:0;display:flex;gap:6px;align-items:baseline;
+  background:var(--ink);color:var(--paper);padding:3px 6px;
+  letter-spacing:.12em;text-transform:uppercase;font-weight:800;font-size:8px;
+}
+.miss-card .meta span:last-child{opacity:.62}
+.done button{
+  margin-top:4px;height:58px;border:0;background:var(--ink);color:var(--paper);
+  font:inherit;font-size:12px;font-weight:900;letter-spacing:.16em;text-transform:uppercase;
+  cursor:pointer;border-radius:2px;   /* karar 61: düğme mekanizma */
+}
+.done button:active{transform:translateY(1px)}
+
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{transition-duration:.001ms!important}}
+</style>
+</head>
+<body>
+<div class="device"><div class="feed" id="feed"></div></div>
+
+<script>
+/* gerçek bir kulüpte çıkacak oran karışımı */
+const SHOTS = [
+  {w:1200,h:800},  {w:800,h:1200}, {w:1000,h:1000},
+  {w:900,h:1600},  {w:1600,h:900}, {w:1200,h:900},
+  {w:900,h:1200},  {w:1800,h:750},
+];
+const N = SHOTS.length;
+const pad2 = n => String(n).padStart(2,'0');
+
+const notches = () => Array.from({length:10},(_,i)=>
+  `<i style="left:calc(8px + ${(i/9).toFixed(4)} * (100% - 16px))"></i>`).join('');
+let html = '';
+SHOTS.forEach((s,i)=>{
+  html += `
+  <section class="shot" data-i="${i}">
+    <div class="masthead"><span>Creatographers</span><span class="right">Kasım</span></div>
+    <div class="rule-bold"></div>
+
+    <div class="plate">
+      <span class="no">${pad2(i+1)}</span>
+      <span class="of">/ ${pad2(N)}</span>
+      <span class="theme">Sokak<small>İsimsiz</small></span>
+    </div>
+    <div class="rule-hair"></div>
+
+    <div class="stage">
+      <div class="holder">
+        <img src="https://picsum.photos/seed/pvk-${i}/${s.w}/${s.h}"
+             width="${s.w}" height="${s.h}" alt="" draggable="false">
+        <span class="reg tl"></span><span class="reg tr"></span>
+        <span class="reg bl"></span><span class="reg br"></span>
+      </div>
+    </div>
+
+    <div class="rule-hair"></div>
+
+    <div class="rate">
+      <div class="row">
+        <span class="lab">Puanın</span>
+        <span class="val empty">Sürükle</span>
+      </div>
+      <div class="slider">
+        <span class="rail2"></span>
+        <span class="fill"></span>
+        <span class="ticks">${notches()}</span>
+        <span class="knob"></span>
+      </div>
+      <div class="scale"><span style="--t:0">01</span><span style="--t:1">10</span></div>
+    </div>
+  </section>`;
+});
+html += `
+  <section class="done" id="done">
+    <div class="rule-bold" style="margin:0 0 14px"></div>
+    <h2>Sokak<br>bitti</h2>
+    <p id="lede">Bu temadaki bütün kareleri gezdin.</p>
+    <div class="miss" id="miss" hidden></div>
+    <button id="go">Başa dön</button>
+  </section>`;
+document.getElementById('feed').innerHTML = html;
+
+const scores = new Array(N).fill(null);
+
+document.querySelectorAll('.shot').forEach(shot=>{
+  const i      = +shot.dataset.i;
+  const slider = shot.querySelector('.slider');
+  const fill   = shot.querySelector('.fill');
+  const knob   = shot.querySelector('.knob');
+  const val    = shot.querySelector('.val');
+
+  const ticks = [...shot.querySelectorAll('.ticks i')];
+  let last = null;
+  /* --p slider'da duruyor: hem dolgu hem topuz aynı kaynaktan okuyor,
+     dolgu topuzun MERKEZİNDE bitiyor ve topuz büyüyünce ikisi birlikte uyuyor. */
+  const paint = v=>{
+    slider.style.setProperty('--p', String((v-1)/9));
+    val.textContent  = pad2(v);
+    val.classList.remove('empty');
+    shot.classList.add('scored');
+    scores[i] = v;
+    if(v !== last){                                   /* C · kademe tıkı */
+      /* İşaret TEK. Zaman aşımıyla söndürmek deneyince iz bırakıyordu: hızlı
+         sürüklemede geçilen beş kademe aynı anda ayakta kalıyordu. Şimdi işaret
+         topuzla birlikte yürüyor, önceki kademe anında iniyor. */
+      ticks.forEach(t=>t.classList.remove('hit'));
+      const t = ticks[v-1];
+      if(t) t.classList.add('hit');
+      if(navigator.vibrate) navigator.vibrate(8);
+    }
+    last = v;
+  };
+  const fromX = x=>{
+    const r = slider.getBoundingClientRect();
+    return Math.round(1 + Math.max(0,Math.min(1,(x-r.left)/r.width))*9);
+  };
+  let drag=false;
+  /* Karar 60: ışıma sürükleme boyunca. Parmak kalkınca sönüyor. */
+  slider.addEventListener('pointerdown',e=>{
+    drag=true; slider.classList.add('dragging'); slider.classList.remove('settling');
+    ticks.forEach(t=>t.classList.remove('at'));
+    slider.setPointerCapture(e.pointerId); paint(fromX(e.clientX));
+  });
+  slider.addEventListener('pointermove',e=>{if(drag)paint(fromX(e.clientX));});
+  const end=()=>{
+    if(!drag) return;
+    drag=false; slider.classList.remove('dragging');
+    slider.classList.add('settling');                 /* B · kademeye otur */
+    ticks.forEach(t=>t.classList.remove('hit'));
+    if(last!=null){
+      slider.style.setProperty('--p', String((last-1)/9));
+      const t=ticks[last-1]; if(t) t.classList.add('at');
+    }
+    setTimeout(()=>slider.classList.remove('settling'), 300);
+  };
+  slider.addEventListener('pointerup',end);
+  slider.addEventListener('pointercancel',end);
+});
+
+const doneEl=document.getElementById('done');
+const missEl=document.getElementById('miss');
+const lede=document.getElementById('lede');
+const go=document.getElementById('go');
+const missing=()=>scores.reduce((a,s,ix)=>s==null?[...a,ix]:a,[]);
+
+/* Eksik kare ızgarası kendi ölçüsünü buluyor, iki kuralla:
+   1. Genişlikte boşluk kalmaz. Sütunlar 1fr, yani her zaman tam genişliği doldurur.
+      Sabit piksel göz + üst sınır kullanmak sağda ölü alan bırakıyordu.
+   2. Son satırda delik kalmaz. Bölme artan kalırsa son karolar sütunları paylaşır
+      (5 kare / 3 sütun -> son satır 2+1 sütun). Kontakt baskı gibi dolu bir yüzey.
+   Yükseklik bütçesi bitiş ekranının o anki boşluğundan ölçülüyor, tahmin edilmiyor.
+   Az kare -> az sütun -> kareler büyüyor; tek kare tam genişliği kaplıyor. */
+const GRID_GAP = 6;
+function layoutMiss(cards){
+  const total = cards.length;
+  if(!total) return;
+  const kids = [...doneEl.children];
+  const flexGap = parseFloat(getComputedStyle(doneEl).rowGap) || 14;
+  let used = 0;
+  kids.forEach(el=>{ if(el !== missEl) used += el.getBoundingClientRect().height; });
+  const budget = Math.max(140, doneEl.clientHeight - used - flexGap*(kids.length-1) - 11);
+  const W = missEl.clientWidth || doneEl.clientWidth;
+
+  /* Kare gözler varsayımıyla sığan en az sütun sayısı. Karekökten başlıyor ki
+     ızgara kare gibi dursun, 2 kare alt alta dizilmesin. */
+  let cols = Math.ceil(Math.sqrt(total));
+  let rows, cell;
+  for(; cols < 6; cols++){
+    rows = Math.ceil(total/cols);
+    cell = (W - GRID_GAP*(cols-1))/cols;
+    if(rows*cell + (rows-1)*GRID_GAP <= budget) break;
+  }
+  rows = Math.ceil(total/cols);
+  cell = (W - GRID_GAP*(cols-1))/cols;
+  const rowH = Math.min(cell, (budget - (rows-1)*GRID_GAP)/rows);
+
+  missEl.style.gridTemplateColumns = `repeat(${cols},1fr)`;
+  missEl.style.gridAutoRows = `${rowH.toFixed(1)}px`;
+
+  cards.forEach(c=>{ c.style.gridColumn=''; c.style.height = `${rowH.toFixed(1)}px`; });
+  const rem = total % cols;
+  if(rem){
+    const tail = [...cards].slice(total-rem);
+    let left = cols;
+    tail.forEach((c,i)=>{
+      const span = Math.round(left/(rem-i));
+      c.style.gridColumn = `span ${span}`;
+      left -= span;
+    });
+  }
+}
+
+function refresh(){
+  const m=missing();
+  if(m.length){
+    lede.textContent='Puan vermeden tema kapanmıyor.';
+    missEl.hidden=false;
+    missEl.innerHTML = m.map(ix => {
+      const shot = SHOTS[ix];
+      const src = `https://picsum.photos/seed/pvk-${ix}/${shot.w}/${shot.h}`;
+      return `
+        <button class="miss-card" type="button" data-index="${ix}">
+          <img src="${src}" alt="" draggable="false">
+          <span class="meta"><span>${pad2(ix+1)}</span><span>kare</span></span>
+        </button>
+      `;
+    }).join('');
+
+    const cards = missEl.querySelectorAll('.miss-card');
+    layoutMiss(cards);
+
+    cards.forEach(btn=>{
+      btn.addEventListener('click',()=>{
+        const feed=document.getElementById('feed');
+        const target=+btn.dataset.index;   /* dıştaki idx'i gölgelemesin */
+        const t=document.querySelector(`.shot[data-i="${target}"]`);
+        if(t) feed.scrollTo({top:t.offsetTop,behavior:'smooth'});
+      });
+    });
+    go.textContent = `${m[0]+1}. kareye git`;
+  } else {
+    lede.textContent='Bütün karelere puan verdin.';
+    missEl.hidden=true;
+    missEl.innerHTML='';
+    go.textContent='Başa dön';
+  }
+}
+new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting)refresh();}),{threshold:.6}).observe(doneEl);
+
+go.addEventListener('click',()=>{
+  const m=missing();
+  const feed=document.getElementById('feed');
+  if(!m.length){ feed.scrollTo({top:0,behavior:'smooth'}); return; }
+  const t=document.querySelector(`.shot[data-i="${m[0]}"]`);
+  feed.scrollTo({top:t.offsetTop,behavior:'smooth'});
+});
+</script>
+</body>
+</html>

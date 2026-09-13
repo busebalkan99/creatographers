@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,maximum-scale=1">
+<title>Creatographers · etkinlik sayfası</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&display=swap" rel="stylesheet">
+<style>
+/* ==========================================================
+   Parça 1 · Etkinlik sayfası
+   Spec: ideations/creatographers/2026-09-12_etkinlik-sayfasi-spec.md
+   Kararlar 10, 18, 19, 24, 38, 43, 51, 59, 65, 68.
+
+   Sayfanın omurgası: ödüller üstte (etkinliğin SONUCU o),
+   galeri altta (gezilecek yer).
+
+   Görünürlük sözleşmesi, bu sayfanın en kritik meselesi:
+   sıralamaya girenin adı + puanı + sırası var,
+   girmeyenin sadece adı var. Kendi karenin puanını sen görürsün,
+   sırasını kimse görmez.
+   ========================================================== */
+:root{
+  --paper:#0A0A0B;
+  --ink:#EDEDEA;
+  --dim:rgba(237,237,234,.58);
+  --faint:rgba(237,237,234,.30);
+  --rule:rgba(237,237,234,.18);
+  --grain:.045;
+  --pad:18px;
+  --ease:cubic-bezier(.32,.72,0,1);
+  /* Karar 59: kimlik işareti safelight yeşili YÜZEY, metin rengi değil.
+     Karar 47'ye göre sonuç aşaması "ışıklar açık", yani aşama rengi yok.
+     Bu tek istisna, çünkü aşama değil KİMLİK bildiriyor. */
+  --me:#0C6E4A;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{background:#050506;color:var(--ink);font-family:"Archivo",system-ui,sans-serif;
+  display:flex;flex-direction:column;align-items:center;gap:14px;padding:18px 0;overflow:auto}
+
+/* ---------- ekran anahtarı (cihazın dışında, prototip aracı) ---------- */
+.tools{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;max-width:430px;padding:0 12px}
+.tools button{
+  appearance:none;border:1px solid var(--rule);background:transparent;color:var(--dim);
+  font:inherit;font-size:9.5px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;
+  padding:8px 11px;cursor:pointer;border-radius:2px;
+}
+.tools button.on{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.tools .lbl{font-size:9px;font-weight:800;letter-spacing:.18em;text-transform:uppercase;
+  color:var(--faint);align-self:center;margin-right:2px}
+.note{max-width:390px;padding:0 14px;font-size:11px;line-height:1.6;color:var(--dim)}
+
+.device{
+  width:min(390px,100vw);height:844px;max-height:calc(100dvh - 92px);
+  position:relative;overflow:hidden;background:var(--paper);
+  border:1px solid var(--rule);display:flex;flex-direction:column;flex:0 0 auto;
+}
+.device::after{
+  content:'';position:absolute;inset:0;z-index:30;pointer-events:none;opacity:var(--grain);
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+/* padding-top BILEREK yok. Sticky bir ogenin top:0'i kabin DOLGU KUTUSUNA gore
+   hizalaniyor, yani kapta ustten dolgu olsaydi serit o kadar asagi yapisir ve
+   ustunde icerigin gectigi acik bir bant kalirdi. Ust bosluk ilk ogeye verildi. */
+.scroll{flex:1;min-height:0;overflow-y:auto;padding:0 var(--pad) 30px;scrollbar-width:none}
+.scroll > .mast{margin-top:16px}
+.scroll::-webkit-scrollbar{display:none}
+
+/* ---------- künye şeridi ---------- */
+.mast{display:flex;align-items:center;gap:9px;font-size:10px;font-weight:800;
+  letter-spacing:.2em;text-transform:uppercase;color:var(--faint)}
+.mast .r{margin-left:auto;letter-spacing:.16em}
+/* Karar 75: Ikonate taban, gömülü round uçlar CSS ile keskine çevriliyor. */
+.mast .ic svg{display:block;width:14px;height:14px}
+.mast .ic svg *{stroke-linecap:butt;stroke-linejoin:miter}
+.rb{height:4px;background:var(--ink);margin-top:8px}
+.hair{height:1px;background:var(--rule)}
+
+/* ---------- etkinlik başlığı ---------- */
+.head h1{margin-top:18px;font-size:30px;line-height:.86;letter-spacing:-.035em;
+  text-transform:uppercase;font-variation-settings:"wdth" 70,"wght" 900}
+.head .meta{display:flex;gap:9px;margin-top:14px;font-size:11px;font-weight:800;
+  letter-spacing:.04em;text-transform:uppercase;color:var(--faint);
+  font-variant-numeric:tabular-nums}
+
+/* ---------- başlık hiyerarşisi: üç seviye ----------
+   Sorun şuydu: beş farklı anlam seviyesi aynı ağırlık ve aynı renkle yazılıyordu,
+   aralarındaki tek fark 1,5 puntoydu. Seviyeyi yarım puntoyla anlatmak hiyerarşi
+   değil gürültü üretiyordu.
+   Ayırıcı artık punto değil, RENK ve AYRAÇ. İkisi de dilin kendi sözlüğünde vardı:
+   4px tam taşma ayracı token setinde duruyordu ama sadece künyenin altında
+   kullanılıyordu.
+
+   1 · Bölüm açar   → mürekkep + üstünde 4px ayraç   (.sec)
+   2 · Öğe etiketler → sönük, geniş harf aralığı      (.award .lab, .mud b)
+   3 · Veri          → sönük, DAR harf aralığı, tabular rakam
+                       (.sec span, .head .meta, .mud .cnt, .bolunme)
+   Üçüncü seviyenin işi az giyinmek: etiket gibi değil sayı gibi okunmalı. */
+/* Punto büyüdü. Önceki gerekçem hatalıydı: Provoke'un "metin çok az" kuralı
+   metnin MİKTARI hakkında ("almost no text"), boyutu hakkında değil. Aynı
+   kaynak listesi "sert tipografi / dynamic typography" diyor, yani iri ve
+   iddialı tipografiyi zaten destekliyor. */
+.sec{margin-top:30px;border-top:4px solid var(--ink);padding-top:12px;padding-bottom:13px;
+  font-size:13px;font-weight:900;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--ink);display:flex;align-items:baseline}
+.sec span{margin-left:auto;font-size:11px;font-weight:800;letter-spacing:.04em;
+  color:var(--faint);font-variant-numeric:tabular-nums}
+
+/* ---------- ödül: kareye ait ---------- */
+/* Karar 43: ödül karesi DEĞERLENDİRİLEN yüzey, kırpılmaz. Kendi oranında duruyor,
+   etrafındaki boşluk karar 64 ile zaten kabul edilmiş durumda. */
+.award{margin-top:18px}
+.award .lab{font-size:11px;font-weight:800;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--faint);padding-bottom:11px}
+.award img{width:100%;height:auto;display:block;background:#17171A}
+/* ters çevrilmiş damga şeridi: tema adı küçük, kazanan iri, ortalama sağda */
+.award .strip{background:var(--ink);color:var(--paper);padding:13px 13px 14px}
+.award .strip .ust{display:flex;align-items:baseline;gap:10px}
+.award .strip b{font-size:8.5px;font-weight:800;letter-spacing:.2em;text-transform:uppercase;
+  opacity:.62;flex:0 0 auto}
+.award .strip .nm{font-size:15px;font-weight:900;text-transform:uppercase;letter-spacing:.01em;
+  line-height:1.15;font-variation-settings:"wdth" 76,"wght" 900;min-width:0}
+.award .strip .av{margin-left:auto;font-size:17px;letter-spacing:-.02em;flex:0 0 auto;
+  font-variation-settings:"wdth" 72,"wght" 900;font-variant-numeric:tabular-nums}
+
+/* Sürpriz kare'nin bölünme satırı ŞERİDİN İÇİNDE.
+   Önce şeridin altında serbest duruyordu ve neye ait olduğu belli değildi:
+   ne ödüle bağlıydı ne de alttaki kutuya. Ödülü kazandıran bilgi ödülün
+   künyesinde durmalı. Ayrıca "3 ve altı" tek başına neyin altı olduğunu
+   söylemiyordu, "puan" kelimesi eklendi. */
+.award .strip .neden{margin-top:12px;padding-top:11px;
+  border-top:1px solid rgba(10,10,11,.22)}
+.award .strip .neden b{display:block;font-size:9.5px;font-weight:800;
+  letter-spacing:.2em;text-transform:uppercase;opacity:.55}
+.award .strip .neden p{margin-top:7px;font-size:12px;font-weight:800;
+  letter-spacing:.01em;line-height:1.45;font-variant-numeric:tabular-nums}
+.award .strip .neden em{font-style:normal;font-size:15px;
+  font-variation-settings:"wdth" 72,"wght" 900}
+
+/* ---------- kürsü: 2. ve 3. (karar 65) ---------- */
+/* Ödül başlığı taşımazlar, sadece numarayla dururlar. Ödül olmadıkları için
+   karar 43'ün kırpma yasağı onları kapsamıyor: gezinme karesi sayılıyorlar. */
+/* Künye tek satırdayken soldaki kolonun puanı, sağdaki kolonun numarasıyla
+   yan yana düşüyordu ("8,3 03") ve tek bir grup gibi okunuyordu. Sebep ölçüydü:
+   kolonlar arası boşluk 4px, kolon İÇİNDEKİ boşluk 7px; yani dışarısı içeriden
+   daha dardı. Sadece boşluğu açmak ikisini birbirine yakın bırakırdı, o yüzden
+   puan kendi satırına indi. Yatayda çarpışacak bir şey kalmadı. */
+.podium{display:flex;gap:8px;margin-top:4px}
+.podium figure{margin:0;flex:1;min-width:0}
+.podium img{width:100%;height:104px;object-fit:cover;display:block;background:#17171A}
+.podium figcaption{margin-top:10px}
+.podium .sat{display:flex;align-items:baseline;gap:8px}
+.podium .no{font-size:11px;line-height:1;color:var(--faint);flex:0 0 auto;
+  font-variation-settings:"wdth" 68,"wght" 900;font-variant-numeric:tabular-nums}
+.podium .nm{font-size:12px;font-weight:900;text-transform:uppercase;letter-spacing:.01em;
+  line-height:1.2;min-width:0;overflow-wrap:anywhere}
+.podium .av{display:block;margin-top:5px;font-size:15px;color:var(--dim);
+  letter-spacing:-.01em;font-variation-settings:"wdth" 72,"wght" 900;
+  font-variant-numeric:tabular-nums}
+
+/* ---------- ödül: kişiye ait ---------- */
+/* Fotoğrafsız, çerçeveli kutu. Fotoğraf kulübünde ödülün kendisi kare, isim değil;
+   kişiye ait ödüller bu yüzden kareye ait olanlardan farklı görünüyor. */
+.people{display:flex;gap:8px;margin-top:12px}
+.people .box{flex:1;min-width:0;border:1px solid var(--rule);padding:11px 11px 12px}
+.people .box b{display:block;font-size:8px;font-weight:800;letter-spacing:.2em;
+  text-transform:uppercase;color:var(--faint)}
+.people .box .nm{display:block;margin-top:7px;font-size:13px;font-weight:900;
+  text-transform:uppercase;letter-spacing:.01em;line-height:1.2;overflow-wrap:anywhere}
+/* Karar 55: Müdavim çoğul ve tabansız, önce sayıyı söyler sonra isimleri döker.
+   Bu yüzden yan yana iki eşit kutu olamıyor; 14 isim yarım genişliğe sığmaz.
+   Spec'ten sapma, gerekçesi karar 55. */
+.mud{margin-top:10px;border:1px solid var(--rule);padding:14px 13px 15px}
+/* Seviye 2: ödül etiketiyle aynı giyinir (8,5px / .24em / sönük). */
+.mud b{font-size:11px;font-weight:800;letter-spacing:.2em;text-transform:uppercase;color:var(--faint)}
+.mud .cnt{margin-left:8px;font-size:13px;letter-spacing:.02em;
+  font-variation-settings:"wdth" 72,"wght" 900;font-variant-numeric:tabular-nums}
+/* Her isim aynı kutuyu alıyor, sadece dolgusu farklı. Önceden yalnız yeşil çipin
+   padding'i vardı, o yüzden çipin bulunduğu satır diğerlerinden yüksek kalıyordu.
+   Blok soldan -7px kaydırılıyor ki ilk isim MÜDAVİM etiketiyle hizalı dursun. */
+.mud .names{margin-top:10px;margin-left:-7px;display:flex;flex-wrap:wrap;gap:4px 0;
+  font-size:10.5px;font-weight:800;letter-spacing:.02em;color:var(--dim);text-transform:uppercase}
+.mud .names span{padding:3px 7px;border-radius:2px;line-height:1.35}
+.mud .names .me{background:var(--me);color:var(--ink)}
+/* Tek kazananlı kişi ödülü (En çok yükselen) aynı kutuyu kullanıyor ama isim iri. */
+.mud .names .tek{font-size:13px;font-weight:900;color:var(--ink);letter-spacing:.01em}
+
+/* ---------- tema sekmeleri ---------- */
+/* Karar 61 sekme şeridini açıkça KESKİN listesine koyuyor, yuvarlaklık yok.
+   Provoke kuralı: aktif durum anında ters çevrilir, geçiş süresi sıfır.
+   Yapışkan, çünkü bir tema bloğu ~2,6 ekran; sekmeyi görmek için yukarı
+   dönmek gerekseydi sekme olmanın anlamı kalmazdı. */
+.tabs{position:sticky;top:0;z-index:5;background:var(--paper);
+  margin-top:30px;padding-top:10px;padding-bottom:2px;display:flex}
+.tabs button{
+  appearance:none;flex:1;min-width:0;background:transparent;border:0;
+  border-top:4px solid var(--rule);color:var(--faint);font:inherit;
+  font-size:11px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;
+  padding:14px 4px 15px;cursor:pointer;border-radius:0;
+}
+.tabs button.on{background:var(--ink);color:var(--paper);border-top-color:var(--ink)}
+.tabs button i{display:block;font-style:normal;margin-top:5px;font-size:9.5px;
+  letter-spacing:.04em;opacity:.6;font-variant-numeric:tabular-nums}
+
+/* ---------- galeri: sıralı liste ---------- */
+/* Karar 65: bu liste DÜZ. 1-2-3 burada ayrışmıyor, ayrım ödüller bölümündeki
+   kürsüde yapılıyor. Beş satır da aynı biçimde. */
+.row{border-top:1px solid var(--rule);min-height:56px;display:flex;align-items:center;
+  gap:12px;padding:9px 0}
+.row .no{font-size:15px;line-height:1;color:var(--faint);width:15px;flex:0 0 auto;
+  font-variation-settings:"wdth" 68,"wght" 900;font-variant-numeric:tabular-nums}
+.row img{width:44px;height:44px;object-fit:cover;flex:0 0 auto;background:#17171A;display:block}
+.row .nm{font-size:12.5px;font-weight:900;text-transform:uppercase;letter-spacing:.01em;
+  line-height:1.2;min-width:0;overflow-wrap:anywhere}
+.row .av{margin-left:auto;font-size:16px;letter-spacing:-.02em;flex:0 0 auto;
+  font-variation-settings:"wdth" 72,"wght" 900;font-variant-numeric:tabular-nums}
+/* Karar 59: kendi satırın soldan 3px yeşil kenar */
+.row.me{box-shadow:inset 3px 0 0 var(--me);padding-left:9px}
+
+/* ---------- galeri: sırasız ızgara ---------- */
+/* Sıralılar 44px, sırasızlar 84px. Bu ters kurulum kasıtlı: sıralama konum ve
+   numarayla anlatılıyor, BOYUTLA DEĞİL. Kazananı büyütmek herkesi kaybeden
+   gibi gösterirdi. Dizilim yükleme sırası (karar 68), etiket yazılmıyor. */
+.grid{display:grid;grid-template-columns:repeat(3,1fr);column-gap:9px;row-gap:22px;margin-top:20px}
+.grid figure{margin:0;min-width:0}
+.grid img{width:100%;height:84px;object-fit:cover;display:block;background:#17171A}
+.grid figure.me img{outline:3px solid var(--me);outline-offset:-3px}
+.grid figure{cursor:pointer}
+.row{cursor:pointer}
+.grid figcaption{margin-top:8px;font-size:9.5px;font-weight:800;letter-spacing:.02em;
+  text-transform:uppercase;color:var(--dim);line-height:1.25;overflow-wrap:anywhere}
+
+/* ---------- fotoğraf detayı ---------- */
+.detay .shot{margin-top:12px}
+.detay .shot img{width:100%;height:auto;display:block;background:#17171A}
+.detay .by{margin-top:13px;display:flex;align-items:baseline;gap:10px}
+/* Karar 79, seviye 2: sayfadaki öğe etiketleriyle aynı (11px / .2em / sönük).
+   Önce 8,5px idi, yani aynı dosyada iki farklı başlık dili vardı. */
+.detay .by b{font-size:11px;font-weight:800;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--faint);flex:0 0 auto}
+/* Sıralamaya girmeyen karede puanın neden yokluğunu söyleyen satır.
+   Seviye 3: veri gibi giyiniyor, başlık gibi değil. */
+.detay .kural{margin-top:10px;font-size:11px;font-weight:800;letter-spacing:.02em;
+  color:var(--faint);line-height:1.5}
+.mast .geri{appearance:none;background:transparent;border:0;padding:0;cursor:pointer;
+  color:inherit;display:flex;align-items:center}
+.detay .by .nm{font-size:17px;font-weight:900;text-transform:uppercase;letter-spacing:.01em;
+  font-variation-settings:"wdth" 76,"wght" 900}
+.detay .by .av{margin-left:auto;font-size:17px;letter-spacing:-.02em;
+  font-variation-settings:"wdth" 72,"wght" 900;font-variant-numeric:tabular-nums}
+
+/* künye tablosu: fotoğraf kitaplarının arka sayfasındaki teknik künye mantığı */
+.exif{margin-top:14px;border-top:4px solid var(--ink);
+  display:grid;grid-template-columns:1fr 1fr;column-gap:14px}
+.exif div{border-bottom:1px solid var(--rule);padding:9px 0 8px;display:flex;align-items:baseline;gap:8px}
+/* Karar 79, seviye 2. Künye etiketleri de 8px'ten çıktı. */
+.exif b{font-size:11px;font-weight:800;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--faint);flex:0 0 auto}
+.exif span{margin-left:auto;font-size:11.5px;font-weight:800;letter-spacing:.02em;
+  font-variant-numeric:tabular-nums;text-align:right}
+
+/* oylama sürerken: kapalı künye. Ekran boş bırakılmıyor (karar 24). */
+.kapali{margin-top:14px;border:1px dashed var(--rule);padding:13px 12px;
+  font-size:11px;line-height:1.6;color:var(--dim)}
+.kapali b{display:block;font-size:11px;font-weight:800;letter-spacing:.2em;
+  text-transform:uppercase;color:var(--faint);margin-bottom:8px}
+/* Kendi puanın görünür (karar 38), sıra HİÇBİR ZAMAN görünmez. */
+.benim{margin-top:12px;border-top:1px solid var(--rule);padding-top:11px;
+  display:flex;align-items:baseline;gap:10px}
+.benim b{font-size:11px;font-weight:800;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--faint)}
+.benim .av{margin-left:auto;font-size:17px;letter-spacing:-.02em;
+  font-variation-settings:"wdth" 72,"wght" 900;font-variant-numeric:tabular-nums}
+
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{transition-duration:.001ms!important}}
+</style>
+</head>
+<body>
+
+<div class="tools" id="tools">
+  <span class="lbl">Ekran</span>
+  <button data-s="sayfa" class="on">Etkinlik sayfası</button>
+  <button data-s="detay">Detay · sonuç açık</button>
+  <button data-s="detay2">Detay · oylama sürüyor</button>
+</div>
+<p class="note" id="note"></p>
+
+<div class="device"><div class="scroll" id="scroll"></div></div>
+
+<script>
+/* Karar 19: tema başına round(kare/2,5) sıralı, en fazla 5.
+   20 karede 5 sıralı, 15 sırasız. */
+const BEN = 'Selin Arı';   /* prototipte "sen" kimsin */
+
+const IC_GERI = `<span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M19 12H5M5 12l6-6M5 12l6 6"/></svg></span>`;
+
+const TEMALAR = [
+  {ad:'Sokak', seed:'sk', toplam:20,
+   /* Temanın karesi artık temanın kendi bloğunda. Ödül karesi kırpılmaz (karar 43),
+      o yüzden gerçek oranıyla çağrılıyor. */
+   odul:{seed:'sk-1', w:1200, h:800, kim:'Ayşe Kaya', av:'8,6'},
+   sirali:[['Ayşe Kaya','8,6'],['Mert Demir','8,3'],['Ece Tan','8,1'],['Selin Arı','7,9'],['Can Öz','7,6']],
+   sirasiz:['Barış Ak','Deniz Yılmaz','Ece Yıldız','Kaan Ersoy','Leyla Uçar','Murat Yavuz',
+            'Okan Yalçın','Sarp Kılıç','Defne Ateş','Emre Gül','Gizem Koç','Cemre Tan',
+            'Burak Sever','Zeynep Aleyna Çetinkaya','Abdurrahman Karaosmanoğlu']},
+  /* "Sen" Sokak'ta sıralamaya giriyor, Portre ve Gece'de girmiyor.
+     Karar 59 kimlik işaretini üç yerde birden istiyor; sırasız ızgaradaki hâli
+     ancak kişi sıralamaya girmediği bir temada görünür. */
+  {ad:'Portre', seed:'pr', toplam:19,
+   odul:{seed:'pr-1', w:900, h:1200, kim:'Deniz Yılmaz', av:'8,4'},
+   sirali:[['Deniz Yılmaz','8,4'],['Leyla Uçar','8,2'],['Ayşe Kaya','7,9'],['Barış Ak','7,7'],['Ece Tan','7,5']],
+   sirasiz:['Mert Demir','Can Öz','Selin Arı','Kaan Ersoy','Murat Yavuz','Okan Yalçın',
+            'Sarp Kılıç','Defne Ateş','Emre Gül','Gizem Koç','Cemre Tan','Burak Sever',
+            'Ece Yıldız','Zeynep Aleyna Çetinkaya']},
+  {ad:'Gece', seed:'gc', toplam:18,
+   odul:{seed:'gc-1', w:1000, h:1000, kim:'Can Öz', av:'8,1'},
+   sirali:[['Can Öz','8,1'],['Sarp Kılıç','7,9'],['Emre Gül','7,6'],['Ayşe Kaya','7,4'],['Defne Ateş','7,2']],
+   sirasiz:['Mert Demir','Deniz Yılmaz','Selin Arı','Ece Tan','Barış Ak','Leyla Uçar',
+            'Kaan Ersoy','Murat Yavuz','Okan Yalçın','Gizem Koç','Cemre Tan','Burak Sever',
+            'Abdurrahman Karaosmanoğlu']},
+];
+
+/* Etkinlik düzeyindeki tek kare ödülü (karar 18). Kürsüsü yok: ikincisi
+   üçüncüsü olan bir sürpriz yok. */
+/* Sürpriz kare "oyları en çok bölen" kareyi ödüllendiriyor, en yüksek ortalamayı
+   alanı değil. Bu yüzden şeritte ortalama YAZMIYOR: ödülü kazandıran sayı o değil.
+   Ölçü iki kamp oranı (bkz. karar 78 tartışması): hem alt uçta hem üst uçta
+   oy yığılan kare kazanıyor. Kesme noktaları gerçek veriyle ayarlanacak. */
+const SURPRIZ = {seed:'sp-1', w:1800, h:750, tema:'Gece', kim:'Murat Yavuz',
+                 /* Ölçü iki kamp oranı (karar 78) ama EKRANDA kamplar yazmıyor.
+                    Ekranda yalnız puanların yayıldığı aralık var: kaç kişinin
+                    düşük verdiği yazılmıyor, "düşük" kelimesi hiç geçmiyor. */
+                 dusuk:5, dusukEsik:3, yuksek:8, yuksekEsik:8, oy:19,
+                 enDusuk:3, enYuksek:9};
+
+const MUDAVIM = ['Ayşe Kaya','Mert Demir','Deniz Yılmaz','Selin Arı','Can Öz','Ece Tan',
+                 'Barış Ak','Leyla Uçar','Kaan Ersoy','Murat Yavuz','Okan Yalçın',
+                 'Sarp Kılıç','Defne Ateş','Emre Gül'];
+
+const foto = (seed,w,h) => `https://picsum.photos/seed/${seed}/${w}/${h}`;
+
+/* ---------- ekran 1: etkinlik sayfası ---------- */
+let aktifTema = 0;   /* hangi tema sekmesi açık */
+
+/* ---------- ekran 1: etkinlik sayfası ---------- */
+/* Yapı: etkinliğin kendi ödülleri üstte, sonra tema sekmeleri.
+   Her sekme bir temanın karesi + kürsüsü + galerisi.
+   Neden: üç temanın kazananı da tam genişlikte ve kırpılmadan duruyor (karar 43),
+   bu tek başına 3,3 ekran ediyordu. Üstüne üç galeri binince sayfa 7,9 ekrana
+   çıkıyor ve üçüncü temanın galerisi 6,5 ekran aşağıda kalıyordu.
+   Ödülleri olduğu yerde bırakıp sadece galeriyi sekmelemek, sekme çubuğuna
+   ulaşmak için 3,3 ekran kaydırmak demekti. */
+function sayfa(){
+  const t = TEMALAR[aktifTema];
+  let h = `
+  <div class="mast">${IC_GERI}<span>Creatographers</span><span class="r">Arşiv</span></div>
+  <div class="rb"></div>
+  <div class="head">
+    <h1>Kasım<br>etkinliği</h1>
+    <div class="meta"><span>05</span><span>· ${TEMALAR.length} tema</span><span>· ${TEMALAR.reduce((a,x)=>a+x.toplam,0)} kare</span><span>· Sonuçlandı</span></div>
+  </div>
+
+  <div class="sec">Etkinliğin ödülleri<span>3 başlık</span></div>
+
+  <div class="award">
+    <div class="lab">Sürpriz kare · etkinlik geneli</div>
+    <img src="${foto(SURPRIZ.seed,SURPRIZ.w,SURPRIZ.h)}" width="${SURPRIZ.w}" height="${SURPRIZ.h}" alt="">
+    <div class="strip">
+      <div class="ust">
+        <b>${SURPRIZ.tema}</b>
+        <span class="nm">${SURPRIZ.kim}</span>
+      </div>
+      <div class="neden">
+        <b>Puanlar</b>
+        <p><em>${SURPRIZ.enDusuk}</em> ile <em>${SURPRIZ.enYuksek}</em> arası</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="mud">
+    <b>En çok yükselen</b>
+    <div class="names"><span class="tek">Kaan Ersoy</span></div>
+  </div>
+  <div class="mud">
+    <b>Müdavim</b><span class="cnt">${MUDAVIM.length} kişi</span>
+    <div class="names">${MUDAVIM.map(n => `<span class="${n===BEN?'me':''}">${n}</span>`).join('')}</div>
+  </div>
+
+  <div class="tabs" id="tabs">
+    ${TEMALAR.map((x,i) => `
+      <button data-t="${i}" class="${i===aktifTema?'on':''}">${x.ad}<i>${x.toplam} kare</i></button>`).join('')}
+  </div>
+
+  <div class="award">
+    <div class="lab">Temanın karesi</div>
+    <img src="${foto(t.odul.seed,t.odul.w,t.odul.h)}" width="${t.odul.w}" height="${t.odul.h}" alt="">
+    <div class="strip">
+      <div class="ust">
+        <b>${t.ad}</b>
+        <span class="nm">${t.odul.kim}</span>
+        <span class="av">${t.odul.av}</span>
+      </div>
+    </div>
+    <div class="podium">
+      ${t.sirali.slice(1,3).map((r,i) => `
+        <figure>
+          <img src="${foto(t.seed+'-'+(i+2),420,320)}" alt="">
+          <figcaption>
+            <span class="sat"><span class="no">0${i+2}</span><span class="nm">${r[0]}</span></span>
+            <span class="av">${r[1]}</span>
+          </figcaption>
+        </figure>`).join('')}
+    </div>
+  </div>
+
+  <div class="sec">${t.ad} galerisi<span>${t.toplam} kare</span></div>
+  ${/* Ilk uc yukarida duruyor: 1. temanin karesi, 2 ve 3 kursude (karar 65).
+       Listede tekrar etmiyorlar. Karar 19'un bes siralisi korunuyor,
+       sadece ucu odul blogunda, ikisi burada. */''}
+  ${t.sirali.slice(3).map((r,i) => `
+    <div class="row ${r[0]===BEN?'me':''}" data-kare
+         data-tema="${t.ad}" data-kim="${r[0]}" data-av="${r[1]}"
+         data-seed="${t.seed}-${i+4}" data-sirali="1" data-benim="${r[0]===BEN?1:0}">
+      <span class="no">${String(i+4).padStart(2,'0')}</span>
+      <img src="${foto(t.seed+'-'+(i+4),300,300)}" alt="">
+      <span class="nm">${r[0]}</span>
+      <span class="av">${r[1]}</span>
+    </div>`).join('')}
+  <div class="grid">
+    ${t.sirasiz.map((n,i) => `
+      <figure class="${n===BEN?'me':''}" data-kare
+              data-tema="${t.ad}" data-kim="${n}" data-av="—"
+              data-seed="${t.seed}-u${i+1}" data-sirali="0" data-benim="${n===BEN?1:0}">
+        <img src="${foto(t.seed+'-u'+(i+1),300,300)}" alt="">
+        <figcaption>${n}</figcaption>
+      </figure>`).join('')}
+  </div>`;
+
+  return h;
+}
+
+/* ---------- ekran 2 ve 3: fotoğraf detayı ---------- */
+/* Artık sayfadan açılıyor: ızgaradaki ya da sıralı listedeki bir kareye
+   dokununca buraya geliniyor ve o karenin verisi taşınıyor.
+   Puan kuralı: sıralamaya girenin puanı görünür (karar 19), girmeyenin
+   görünmez (karar 10), ama kendi karensе kendi ortalamanı görürsün (karar 38). */
+let detayKare = null;      /* hangi kare açık */
+let sayfaScroll = 0;       /* galeriye dönünce yerini kaybetme */
+
+const VARSAYILAN_KARE = {tema:'Sokak', kim:'Ayşe Kaya', av:'8,6', seed:'sk-1', w:1200, h:800,
+                         sirali:true, benim:false};
+
+function detay(sonucAcik){
+  const k = detayKare || VARSAYILAN_KARE;
+  /* Puanı kim görür: sıralıysa herkes, sırasızsa sadece sahibi. */
+  const puanGorunur = k.sirali || k.benim;
+  return `
+  <div class="mast"><button class="geri" id="geri">${IC_GERI}</button><span>${k.tema}</span><span class="r">Kasım · 05</span></div>
+  <div class="rb"></div>
+  <div class="detay">
+    <div class="shot"><img src="${foto(k.seed,k.w,k.h)}" width="${k.w}" height="${k.h}" alt=""></div>
+    ${sonucAcik ? `
+      <div class="by">
+        <b>Çeken</b><span class="nm">${k.kim}</span>
+        ${puanGorunur ? `<span class="av">${k.av}</span>` : ''}
+      </div>
+      ${puanGorunur ? '' : `<p class="kural">Sıralamaya girmeyen karelerin puanı gösterilmiyor.</p>`}
+      <div class="exif">
+        <div><b>Gövde</b><span>Nikon Z6 II</span></div>
+        <div><b>Objektif</b><span>35mm f/1.8 S</span></div>
+        <div><b>Diyafram</b><span>f/2.0</span></div>
+        <div><b>Enstantane</b><span>1/250 sn</span></div>
+        <div><b>ISO</b><span>400</span></div>
+        <div><b>Odak</b><span>35 mm</span></div>
+      </div>` : `
+      <div class="kapali">
+        <b>Kapalı</b>
+        Çeken ve kamera bilgisi sonuçlar açılınca görünecek · 2 gün
+      </div>
+      <div class="benim">
+        <b>Senin puanın</b><span class="av">8</span>
+      </div>`}
+  </div>`;
+}
+
+const EKRANLAR = {
+  sayfa:  {yap: sayfa,
+    not:'Ödüller üstte çünkü etkinliğin sonucu o; galeri altta çünkü gezilecek yer. Kürsü (karar 65) ödül bloğunun içinde: 1. tam genişlikte, 2. ve 3. altında küçük ve sadece numarayla. Galerideki sıralı liste bilerek düz.'},
+  detay:  {yap: () => detay(true),
+    not:'Sonuç açıldıktan sonra: çeken, ortalama ve iki sütunlu künye. Fotoğraf kitaplarının arka sayfasındaki teknik künye mantığı.'},
+  detay2: {yap: () => detay(false),
+    not:'Oylama sürerken (karar 24): çeken ve kamera bilgisi kapalı, ama ekran boş bırakılmıyor. Kendi puanın görünüyor (karar 38), sıra hiçbir zaman görünmüyor.'},
+};
+
+function goster(ad, scrollY){
+  const sc = document.getElementById('scroll');
+  sc.innerHTML = EKRANLAR[ad].yap();
+  document.getElementById('note').textContent = EKRANLAR[ad].not;
+  sc.scrollTop = scrollY || 0;
+  document.querySelectorAll('.tools button').forEach(b =>
+    b.classList.toggle('on', b.dataset.s === ad));
+}
+document.getElementById('tools').addEventListener('click', e => {
+  const b = e.target.closest('button'); if (!b) return;
+  /* Araç çubuğu prototip kontrolü; elle detaya geçilince örnek kare gösterilir. */
+  if (b.dataset.s !== 'sayfa') detayKare = null;
+  goster(b.dataset.s);
+});
+document.getElementById('scroll').addEventListener('click', e => {
+  const sc = document.getElementById('scroll');
+
+  /* Tema değişince sekme şeridi ekranın üstüne gelir; kullanıcı temayı
+     değiştirdiğinde yeni temanın başında olur, sayfanın ortasında değil. */
+  const sekme = e.target.closest('.tabs button');
+  if (sekme) {
+    aktifTema = +sekme.dataset.t;
+    sc.innerHTML = sayfa();
+    sc.scrollTop = document.getElementById('tabs').offsetTop - 4;
+    return;
+  }
+
+  /* Bir kareye dokunmak detayı açar. Spec bölüm 4: detay HERHANGİ bir küçük
+     kareden açılır. Önceden detaya yalnız cihazın dışındaki prototip
+     anahtarından gidilebiliyordu, yani arayüzün parçası olmayan bir yerden. */
+  const kare = e.target.closest('[data-kare]');
+  if (kare) {
+    const d = kare.dataset;
+    detayKare = {tema:d.tema, kim:d.kim, av:d.av, seed:d.seed,
+                 w:1200, h:800, sirali:d.sirali==='1', benim:d.benim==='1'};
+    sayfaScroll = sc.scrollTop;          /* galeriye dönünce yer korunsun */
+    goster('detay');
+    return;
+  }
+
+  /* Geri: sayfaya BIRAKTIĞIN yere döner, başa değil. */
+  if (e.target.closest('#geri')) {
+    detayKare = null;
+    goster('sayfa', sayfaScroll);
+  }
+});
+goster('sayfa');
+</script>
+</body>
+</html>

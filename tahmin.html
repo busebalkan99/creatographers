@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,maximum-scale=1">
+<title>Creatographers · tahmin oyunu</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&display=swap" rel="stylesheet">
+<style>
+/* ==========================================================
+   Parça 3 · Tahmin oyunu (karar 16, 25)
+   Karar 25 varlığını söylüyordu, işleyişi hiç konuşulmamıştı.
+
+   Ne zaman: etkinliğin BÜTÜN temalarına puan verince açılır.
+     Açtığın anda puanların kilitlenir (karar 37'nin geri dönme hakkı biter).
+     Gerekçe: tahmin "bu kareyi kim çekti" kanaati oluşturmanı istiyor, karar 5'in
+     isimsiz puanlamayla engellemeye çalıştığı şey tam olarak bu. Kilit olmadan
+     tahmin oylamaya sızar.
+   Ne sorar: bütün temalardan seçilmiş 5 kare, her birine 4 aday isim.
+   Adaylar: 3 yanlış aday ETKİNLİĞE KARE VEREN HERKESTEN.
+     Önce "kulübün tamamından" diye kurulmuştu, sızıntı endişesiyle. Buse düzeltti:
+     kulüp etkinlikleri photowalk gibi grupça yapıyor, yani o gün kimin geldiği zaten
+     herkesin bildiği bir şey. Kulübün tamamından aday çekince orada olmayan isimler
+     anında eleniyor ve oyun çöküyor.
+     Sızıntı pratikte yok: 20 kişilik kulüpte neredeyse herkes her etkinliğe katıldığı
+     için "katılımcı listesi" bilgi taşımıyor. Havuz TEMA değil ETKİNLİK düzeyinde,
+     yani kimin hangi temaya kare verdiği yine gizli kalıyor.
+   Çıktı: skorun sadece sana. Fotoğrafçıya "karen kaç kişi tarafından tanındı".
+   Aşama: oylama penceresi hâlâ açık, yani safelight yeşili geçerli (karar 47)
+     ve ilerleme çubuğu ışıyor (karar 60, "süren iş ışır").
+   ========================================================== */
+:root{
+  --paper:#0A0A0B;
+  --ink:#EDEDEA;
+  --dim:rgba(237,237,234,.58);
+  --faint:rgba(237,237,234,.30);
+  --rule:rgba(237,237,234,.18);
+  --grain:.045;
+  --pad:16px;
+  --ease:cubic-bezier(.32,.72,0,1);
+  --acc:#0C6E4A;                /* oylama aşaması, Kodak No.3 safelight */
+  --glow:0 0 7px rgba(12,110,74,.7), 0 0 22px rgba(12,110,74,.34);
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{background:#050506;color:var(--ink);font-family:"Archivo",system-ui,sans-serif;
+  display:flex;flex-direction:column;align-items:center;gap:14px;padding:18px 0;overflow:auto}
+
+.tools{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;max-width:430px;padding:0 12px}
+.tools button{appearance:none;border:1px solid var(--rule);background:transparent;color:var(--dim);
+  font:inherit;font-size:9.5px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;
+  padding:10px 12px;cursor:pointer;border-radius:2px}
+.tools button.on{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.tools .lbl{font-size:9px;font-weight:800;letter-spacing:.18em;text-transform:uppercase;
+  color:var(--faint);align-self:center;margin-right:2px}
+
+.device{width:min(390px,100vw);height:844px;max-height:calc(100dvh - 92px);
+  position:relative;overflow:hidden;background:var(--paper);border:1px solid var(--rule);
+  display:flex;flex-direction:column;flex:0 0 auto}
+.device::after{content:'';position:absolute;inset:0;z-index:30;pointer-events:none;opacity:var(--grain);
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E")}
+.sc{flex:1;min-height:0;overflow-y:auto;padding:14px var(--pad) 16px;scrollbar-width:none}
+.sc::-webkit-scrollbar{display:none}
+
+.mast{display:flex;font-size:9px;font-weight:800;letter-spacing:.22em;text-transform:uppercase;color:var(--faint)}
+.mast .r{margin-left:auto;letter-spacing:.16em}
+.rb{height:4px;background:var(--ink);margin-top:8px}
+.hair{height:1px;background:var(--rule);margin-top:13px}
+
+h2.t{font-size:38px;line-height:.86;letter-spacing:-.045em;text-transform:uppercase;margin-top:14px;
+  font-variation-settings:"wdth" 70,"wght" 900;overflow-wrap:anywhere}
+p.lede{font-size:13px;color:var(--dim);line-height:1.6;letter-spacing:.02em;margin-top:11px;max-width:34ch}
+
+/* ilerleme: vurgu yüzeyi, süren iş olduğu için ışıyor (karar 60) */
+.prog{display:flex;gap:4px;margin-top:11px}
+.prog i{flex:1;height:4px;background:rgba(237,237,234,.14);display:block}
+.prog i.on{background:var(--acc);box-shadow:var(--glow)}
+
+.soru{font-size:9.5px;font-weight:800;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--faint);margin-top:13px}
+/* Karar 43'ün mantığı burada da geçerli: tahmin etmek için kareye bakman gerekiyor,
+   kırpmak tanımanı sağlayacak ipuçlarını gizleyebilir. Fotoğraf kendi oranında,
+   kalan boşluğu alarak duruyor. */
+.shot{width:100%;object-fit:contain;display:block;background:#17171A;margin-top:9px}
+.sc.oyun{display:flex;flex-direction:column}
+.sc.oyun .shot{flex:1;min-height:150px}
+.sc.oyun .dort{flex:0 0 auto}
+
+/* dört aday */
+.dort{display:flex;flex-direction:column;gap:6px;margin-top:13px}
+.nm{appearance:none;border:1px solid var(--rule);background:transparent;color:var(--ink);
+  font:inherit;font-size:13px;font-weight:900;text-transform:uppercase;letter-spacing:.01em;
+  cursor:pointer;border-radius:2px;text-align:left;overflow-wrap:anywhere;line-height:1.2;
+  min-height:56px;padding:10px 12px;display:flex;align-items:center}
+.nm.on{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.gec{margin-top:11px;appearance:none;border:0;background:none;width:100%;
+  font:inherit;font-size:9.5px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--faint);min-height:48px;cursor:pointer}
+
+/* kilit uyarısı */
+.uyari{border:1px dashed rgba(237,237,234,.26);padding:15px 14px 16px;margin-top:15px}
+.uyari b{display:block;font-size:12px;font-weight:900;text-transform:uppercase;letter-spacing:.03em}
+.uyari span{display:block;font-size:10px;line-height:1.6;color:var(--faint);margin-top:6px;max-width:34ch}
+
+.buyuk{appearance:none;border:0;background:var(--ink);color:var(--paper);width:100%;
+  font:inherit;font-size:12px;font-weight:900;letter-spacing:.16em;text-transform:uppercase;
+  min-height:58px;border-radius:2px;cursor:pointer;margin-top:14px}
+.ikincil{appearance:none;border:1px solid var(--rule);background:none;color:var(--dim);width:100%;
+  font:inherit;font-size:10px;font-weight:900;letter-spacing:.18em;text-transform:uppercase;
+  min-height:48px;border-radius:2px;cursor:pointer;margin-top:9px}
+
+/* sonuç */
+/* Kendi 4px çizgisi yoktu, konulunca künye çizgisiyle 30px arayla iki kalın hat
+   oluşuyordu. Künyeninki zaten ayırıyor, bu kaldırıldı. */
+.skor{display:flex;align-items:baseline;gap:10px;margin-top:20px}
+.skor b{font-size:52px;line-height:.8;letter-spacing:-.05em;
+  font-variation-settings:"wdth" 68,"wght" 900;font-variant-numeric:tabular-nums}
+.skor span{font-size:10px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:var(--faint)}
+.cevap{border-top:1px solid var(--rule);display:flex;align-items:center;gap:10px;padding:8px 0;min-height:56px}
+.cevap img{width:44px;height:44px;object-fit:cover;flex:0 0 auto;background:#17171A;display:block}
+.cevap .kim{font-size:12px;font-weight:900;text-transform:uppercase;letter-spacing:.01em;
+  line-height:1.25;overflow-wrap:anywhere;min-width:0}
+.cevap .kim em{display:block;font-style:normal;font-size:8.5px;font-weight:800;letter-spacing:.14em;
+  color:var(--faint);margin-top:3px}
+/* Doğru işareti: soldan ince mürekkep çubuk. Profildeki "sıralamaya girdi" işaretinin
+   aynı dili, yeni bir biçim icat edilmiyor.
+   Önce onay kutusu kullanılmıştı (mürekkep blok + tik) ama o şekil ayarlardaki
+   "kulüp afişi" kutusuyla birebir aynıydı: orada anlamı "açıp kapatabilirsin",
+   burada "bunu bildin". Aynı biçim iki farklı iş yapıyordu ve burada dokunulabilir
+   bile değildi.
+   Yanlışta işaret yok ve kırmızı da yok: yanlış tahmin bir kusur değil, oyunun kendisi.
+   Bütün satırlarda aynı sol pay var ki doğru olanlar sağa kaymasın. */
+.cevap{padding-left:9px}
+.cevap.dogru{box-shadow:inset 3px 0 0 var(--ink)}
+
+/* tanınma satırı, fotoğraf detayında */
+.tan{border-top:1px solid var(--rule);display:flex;align-items:baseline;gap:10px;padding:11px 0}
+.tan .k{font-size:8.5px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--faint);width:86px;flex:0 0 auto}
+.tan .v{font-size:12.5px;font-weight:900;text-transform:uppercase;letter-spacing:.01em}
+.tan .n{margin-left:auto;font-size:8.5px;font-weight:800;letter-spacing:.12em;
+  text-transform:uppercase;color:var(--faint);font-variant-numeric:tabular-nums}
+
+.alt{flex:0 0 auto;border-top:1px solid var(--rule);padding:11px var(--pad) 13px;
+  display:flex;align-items:center;gap:10px}
+/* Karar 79: bu blok zaten iki katmanlı (üstte sönük etiket, altta mürekkep gövde),
+   yani hiyerarşi doğru kurulmuş. Yalnız puntolar seviye tablosuna getirildi:
+   etiket 11px sönük (seviye 2), gövde 13px mürekkep (seviye 1). */
+.alt .sec{font-size:11px;font-weight:800;letter-spacing:.2em;text-transform:uppercase;color:var(--faint)}
+.alt .sec b{color:var(--ink);display:block;font-size:13px;margin-top:5px;letter-spacing:.02em;
+  font-weight:900;overflow-wrap:anywhere}
+.ileri{margin-left:auto;appearance:none;border:0;background:var(--ink);color:var(--paper);
+  font:inherit;font-size:11px;font-weight:900;letter-spacing:.16em;text-transform:uppercase;
+  min-height:48px;padding:0 18px;border-radius:2px;cursor:pointer;opacity:.35;pointer-events:none;
+  flex:0 0 auto}
+.ileri.hazir{opacity:1;pointer-events:auto}
+
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{transition-duration:.001ms!important}}
+</style>
+</head>
+<body>
+<div class="tools" id="tools"></div>
+<div class="device"><div class="sc" id="screen"></div><div id="altbar"></div></div>
+
+<script>
+const UYE=['Ayşe Kaya','Deniz Yılmaz','Mert Demir','Selin Arı','Can Öz','Elif Sunar','Kaan Uz',
+ 'Melis Ay','Onur Tek','Pelin Er','Sinan Gül','Tuna Kara','Yasemin Ok','Berk Alp','Derya Sav',
+ 'Emre Toz','Barış Ak','Zeynep Aleyna Çetinkaya','Abdurrahman Karaosmanoğlu'];
+
+/* 5 kare, etkinliğin bütün temalarından. Her birinde doğru + kulübün tamamından 3 aday. */
+/* h: gerçek kulüpteki oran karışımı. Kırpma yok, kare kendi oranında duruyor. */
+const KARE=[
+ {seed:'th-1', tema:'Sokak',  h:470, dogru:'Deniz Yılmaz', adaylar:['Deniz Yılmaz','Ayşe Kaya','Sinan Gül','Melis Ay']},
+ {seed:'th-2', tema:'Portre', h:980, dogru:'Ayşe Kaya',    adaylar:['Kaan Uz','Ayşe Kaya','Emre Toz','Pelin Er']},
+ {seed:'th-3', tema:'Gece',   dogru:'Abdurrahman Karaosmanoğlu',
+   adaylar:['Onur Tek','Abdurrahman Karaosmanoğlu','Derya Sav','Can Öz']},
+ {seed:'th-4', tema:'Sokak',  dogru:'Selin Arı',    adaylar:['Berk Alp','Tuna Kara','Selin Arı','Elif Sunar']},
+ {seed:'th-5', tema:'Gece',   dogru:'Zeynep Aleyna Çetinkaya',
+   adaylar:['Zeynep Aleyna Çetinkaya','Yasemin Ok','Barış Ak','Mert Demir']},
+];
+
+const S={ekran:'teklif', i:0, secim:new Array(KARE.length).fill(null)};
+
+const EKRANLAR=[
+ {k:'teklif',  ad:'Teklif'},
+ {k:'oyun',    ad:'Tahmin 1/5'},
+ {k:'gonder',  ad:'Gönderildi'},
+ {k:'sonuc',   ad:'Sonuç'},
+ {k:'taninma', ad:'Tanınma'},
+];
+
+/* ---------- 1 · teklif, kilit uyarısıyla ---------- */
+function teklif(){
+  return {sc:`
+    <div class="mast"><span>Kasım Etkinliği</span><span class="r">Oyların tamam</span></div>
+    <div class="rb"></div>
+    <h2 class="t">Üç temanın<br>hepsi bitti</h2>
+    <p class="lede">Sonuçlar iki gün sonra açılıyor. O zamana kadar isteğe bağlı bir oyun var.</p>
+    <div class="hair"></div>
+    <div class="soru" style="margin-top:15px">Kim çekti · isteğe bağlı</div>
+    <p class="lede" style="margin-top:7px">Beş kare seçildi. Her birinde dört isimden birini
+    seçiyorsun. Skorun sadece sana görünür.</p>
+    <div class="uyari"><b>Başlarsan puanların kilitlenir</b>
+      <span>Tahmin etmek "bu kareyi kim çekti" diye düşünmeni istiyor. Puanların açık kalırsa
+      o düşünce oylamana sızar. Bu yüzden oyun başladığı anda verdiğin puanlar
+      değiştirilemez hale gelir.</span></div>
+    <button class="buyuk">Oyunu başlat</button>
+    <button class="ikincil">Puanlarımı gözden geçir</button>`, alt:''};
+}
+
+/* ---------- 2 · tahmin ---------- */
+function oyun(){
+  const k=KARE[S.i], sec=S.secim[S.i];
+  return {sc:`
+    <div class="mast"><span>Kasım Etkinliği</span><span class="r">Tahmin</span></div>
+    <div class="rb"></div>
+    <div class="prog">${KARE.map((_,i)=>`<i class="${i<=S.i?'on':''}"></i>`).join('')}</div>
+    <div class="soru">Bu kareyi kim çekti · ${S.i+1} / ${KARE.length}</div>
+    <img class="shot" src="https://picsum.photos/seed/${k.seed}/700/${k.h||380}" alt="">
+    <div class="dort">${k.adaylar.map(n=>
+      `<button class="nm ${sec===n?'on':''}" data-n="${n}">${n}</button>`).join('')}</div>
+    <button class="gec" data-gec="1">Bilmiyorum, geç</button>`,
+  alt:`<div class="alt">
+      <span class="sec">Seçimin<b>${sec||'—'}</b></span>
+      <button class="ileri ${sec?'hazir':''}" data-ileri="1">${S.i===KARE.length-1?'Gönder':'Sıradaki'}</button>
+    </div>`};
+}
+
+/* ---------- 3 · gönderildi ---------- */
+function gonder(){
+  const atlanan=S.secim.filter(x=>x===null).length;
+  return {sc:`
+    <div class="mast"><span>Kasım Etkinliği</span><span class="r">Tahmin</span></div>
+    <div class="rb"></div>
+    <h2 class="t">Tahminlerin<br>gönderildi</h2>
+    <p class="lede">${KARE.length-atlanan} kareye isim verdin${atlanan?`, ${atlanan} kareyi geçtin`:''}.
+    Doğru cevaplar sonuçlarla birlikte açılıyor.</p>
+    <div class="hair"></div>
+    <div class="soru" style="margin-top:15px">Şimdi ne oluyor</div>
+    <p class="lede" style="margin-top:7px">Oylama iki gün sonra kapanıyor. Sonuçlar açılınca
+    kaç bildiğini burada göreceksin.</p>
+    <div class="uyari" style="margin-top:15px"><b>Puanların kilitli</b>
+      <span>Bu etkinlikte verdiğin puanlar artık değiştirilemiyor.</span></div>`, alt:''};
+}
+
+/* ---------- 4 · sonuç ---------- */
+function sonuc(){
+  /* Skor ve işaretler GERÇEK cevaplardan. Önce sabit bir dizi yazılmıştı
+     ([true,false,true,false,true]) ve beşi de doğru seçilmiş bir turda ekran 3/5
+     gösterip iki doğru satırı yanlış damgalıyordu. Davranış testinde yakalandı:
+     kod kendi içinde tutarlıydı ve yine de yanlıştı. */
+  const dogru = KARE.map((k,i)=> S.secim[i]===k.dogru);
+  const sayi=dogru.filter(Boolean).length;
+  return {sc:`
+    <div class="mast"><span>Kasım Etkinliği</span><span class="r">Tahmin sonucu</span></div>
+    <div class="rb"></div>
+    <div class="skor"><b>${sayi}/${KARE.length}</b><span>Doğru<br>bildin</span></div>
+    <p class="lede" style="margin-top:12px">Bu skoru sadece sen görüyorsun.</p>
+    <div class="soru" style="margin-top:17px">Kareler kimindi</div>
+    ${KARE.map((k,i)=>`
+      <div class="cevap ${dogru[i]?'dogru':''}">
+        <img src="https://picsum.photos/seed/${k.seed}/200/200" alt="">
+        <span class="kim">${k.dogru}<em>${k.tema} · senin tahminin: ${
+          S.secim[i]||'geçtin'}</em></span>
+      </div>`).join('')}`, alt:''};
+}
+
+/* ---------- 5 · fotoğrafçıya dönen tanınma ---------- */
+function taninma(){
+  return {sc:`
+    <div class="mast"><span>Kasım Etkinliği</span><span class="r">Sokak</span></div>
+    <div class="rb"></div>
+    <img class="shot" style="height:232px" src="https://picsum.photos/seed/th-1/700/460" alt="">
+    <div class="soru" style="margin-top:13px">Çeken</div>
+    <h2 class="t" style="font-size:26px;margin-top:6px">Deniz Yılmaz</h2>
+    <div class="soru" style="margin-top:17px">Nasıl çekildi<span></span></div>
+    <div class="tan"><span class="k">Odak</span><span class="v">35mm</span><span class="n">f/2.0</span></div>
+    <div class="tan"><span class="k">Işık</span><span class="v">Alacakaranlık</span><span class="n">ISO 1600</span></div>
+    <div class="soru" style="margin-top:17px">Tahmin oyunu</div>
+    <div class="tan"><span class="k">Tanınma</span><span class="v">12 kişiden 7'si</span>
+      <span class="n">bu kareyi<br>sana bağladı</span></div>
+    <p class="lede" style="margin-top:11px;font-size:11px">Bu satır yalnızca karen tahmin
+    oyununa seçildiyse ve yeterli sayıda tahmin toplandıysa çıkar.</p>`, alt:''};
+}
+
+const CIZ={teklif,oyun,gonder,sonuc,taninma};
+
+function ciz(){
+  const r=CIZ[S.ekran]();
+  const scEl=document.getElementById('screen');
+  scEl.className = 'sc' + (S.ekran==='oyun' ? ' oyun' : '');
+  scEl.innerHTML=r.sc;
+  document.getElementById('altbar').innerHTML=r.alt;
+  document.getElementById('screen').scrollTop=0;
+  document.getElementById('tools').innerHTML=`<span class="lbl">Ekran</span>`+
+    EKRANLAR.map(e=>`<button class="${e.k===S.ekran?'on':''}" data-e="${e.k}">${e.ad}</button>`).join('');
+}
+
+document.addEventListener('click',e=>{
+  const ek=e.target.closest('[data-e]');
+  if(ek){ S.ekran=ek.dataset.e; if(S.ekran==='oyun') S.i=0; return ciz(); }
+
+  const n=e.target.closest('[data-n]');
+  if(n){ S.secim[S.i]=n.dataset.n; return ciz(); }
+
+  if(e.target.closest('[data-gec]')){ S.secim[S.i]=null; ilerle(); return; }
+  if(e.target.closest('[data-ileri]')){ ilerle(); return; }
+
+  if(e.target.closest('.buyuk') && S.ekran==='teklif'){ S.ekran='oyun'; S.i=0; return ciz(); }
+});
+
+function ilerle(){
+  if(S.i < KARE.length-1){ S.i++; ciz(); }
+  else { S.ekran='gonder'; ciz(); }
+}
+
+ciz();
+</script>
+</body>
+</html>

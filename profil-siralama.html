@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,maximum-scale=1">
+<title>Creatographers · profil ve sıralama</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&display=swap" rel="stylesheet">
+<style>
+/* ==========================================================
+   Parça 2 · Sıralama ve Profil sekmeleri
+   Spec: ideations/creatographers/2026-09-12_profil-siralama-spec.md
+   Kararlar 51-62 + 64.
+
+   Yerleştirme kuralı (62): birden fazla kişiyi birbirine göre diziyorsa
+   Sıralama'da, tek kişiyi anlatıyorsa Profil'de.
+   ========================================================== */
+:root{
+  --paper:#0A0A0B;
+  --ink:#EDEDEA;
+  --dim:rgba(237,237,234,.58);
+  --faint:rgba(237,237,234,.30);
+  --rule:rgba(237,237,234,.18);
+  --grain:.045;
+  --pad:16px;                 /* Apple HIG 16pt · Material 3 16dp */
+  --ease:cubic-bezier(.32,.72,0,1);
+  /* Karar 59: kimlik işareti safelight yeşili YÜZEY. Üstünde açık metin 5,4:1,
+     zeminden 3,2:1. Yeşili metin rengi yapmak 3,2:1 verirdi, eşiğin altı.
+     Karar 47'ye göre Sıralama "ışıklar açık" hâlinde; bu tek istisna, çünkü
+     aşama değil KİMLİK bildiriyor. */
+  --me:#0C6E4A;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{background:#050506;color:var(--ink);font-family:"Archivo",system-ui,sans-serif;
+  display:flex;flex-direction:column;align-items:center;gap:14px;padding:18px 0;overflow:auto}
+
+/* ---------- durum anahtarı (cihazın dışında, prototip aracı) ---------- */
+.tools{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;max-width:430px;padding:0 12px}
+.tools button{
+  appearance:none;border:1px solid var(--rule);background:transparent;color:var(--dim);
+  font:inherit;font-size:9.5px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;
+  padding:8px 11px;cursor:pointer;border-radius:2px;   /* karar 61: mekanizma */
+}
+.tools button.on{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.tools .lbl{font-size:9px;font-weight:800;letter-spacing:.18em;text-transform:uppercase;
+  color:var(--faint);align-self:center;margin-right:2px}
+
+.device{
+  width:min(390px,100vw);height:844px;max-height:calc(100dvh - 92px);
+  position:relative;overflow:hidden;background:var(--paper);
+  border:1px solid var(--rule);display:flex;flex-direction:column;flex:0 0 auto;
+}
+.device::after{
+  content:'';position:absolute;inset:0;z-index:30;pointer-events:none;opacity:var(--grain);
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+.scroll{flex:1;min-height:0;overflow-y:auto;padding:14px var(--pad) 18px;scrollbar-width:none}
+.scroll::-webkit-scrollbar{display:none}
+
+.mast{display:flex;font-size:9px;font-weight:800;letter-spacing:.22em;text-transform:uppercase;
+  color:var(--faint)}
+.mast .r{margin-left:auto;letter-spacing:.16em}
+.rb{height:4px;background:var(--ink);margin-top:8px}   /* mürekkep ayraç, ışımaz */
+
+/* Karar 79, seviye 1: bölüm başlığı mürekkep rengi + üstünde 4px tam taşma ayraç.
+   Ayırıcı punto değil renk ve ayraç; beş anlam seviyesi aynı ağırlık ve aynı
+   renkle yazıldığında hiyerarşi değil gürültü çıkıyor. */
+.sec{margin-top:26px;border-top:4px solid var(--ink);padding-top:12px;padding-bottom:12px;
+  font-size:13px;font-weight:900;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--ink);display:flex;align-items:baseline}
+.sec span{margin-left:auto;font-size:11px;font-weight:800;letter-spacing:.04em;
+  color:var(--faint);text-align:right;font-variant-numeric:tabular-nums}
+
+/* ---------- boş / kilitli blok ---------- */
+/* Parça 1'deki kapalı kamera künyesiyle aynı dil: kesikli çerçeve.
+   Ortalama kaldırıldı: uygulamanın tamamı sola hizalı (künye, isim, bölüm başlığı,
+   liste, sayı), üç büyük bloğu ortalamak tipografik ızgarayı kırıyordu.
+   Yuvarlaklık kaldırıldı: karar 61 yuvarlaklığı MEKANİZMAYA veriyor (topuz, çip,
+   düğme, onay kutusu, rozet çerçevesi). Boş durum bir panel, kontrol değil. */
+.empty{border:1px dashed rgba(237,237,234,.26);padding:15px 14px 16px}
+.empty b{display:block;font-size:12px;font-weight:900;text-transform:uppercase;letter-spacing:.03em}
+.empty span{display:block;font-size:10px;line-height:1.6;color:var(--faint);margin-top:6px;max-width:34ch}
+
+/* ================= SIRALAMA ================= */
+.seas{margin-top:14px;display:flex;align-items:baseline;gap:9px}
+.seas h2{font-size:26px;line-height:.86;letter-spacing:-.035em;text-transform:uppercase;
+  font-variation-settings:"wdth" 70,"wght" 900}
+.seas .of{margin-left:auto;font-size:9px;font-weight:800;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--faint)}
+.prog{display:flex;gap:4px;margin-top:10px}
+.prog i{flex:1;height:4px;background:rgba(237,237,234,.14);display:block}
+.prog i.on{background:var(--ink)}
+
+/* Müdavim: ters çevrilmiş mürekkep şerit. Karar 55: çoğul ve tabansız. */
+.mud{background:var(--ink);color:var(--paper);margin-top:14px;padding:11px var(--pad) 12px}
+.mud .k{font-size:8.5px;font-weight:800;letter-spacing:.2em;text-transform:uppercase;
+  opacity:.6;display:flex}
+.mud .k span{margin-left:auto;letter-spacing:.14em}
+.mud .big{font-size:26px;line-height:.9;letter-spacing:-.03em;text-transform:uppercase;margin-top:6px;
+  font-variation-settings:"wdth" 70,"wght" 900}
+.mud .one{font-size:17px;font-weight:900;text-transform:uppercase;letter-spacing:.01em;
+  margin-top:5px;line-height:1.25;font-variation-settings:"wdth" 78,"wght" 900}
+/* Satır aralığı 2,6: isimler dokunulabilir olunca (karar 58) hedef boyu gerekiyordu.
+   1,7'de 19px kalıyordu. Sırasız bloktaki 2,8 ile aynı mantık, burada bir tık daha dar
+   çünkü şerit 14 isimde fazla uzuyor. */
+.mud .list{font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:.01em;
+  margin-top:9px;line-height:3.1;opacity:.78}   /* 11px x 3,1 = 34px, sırasız blokla aynı */
+/* Karar 58: isim nerede görünüyorsa oraya dokunulabilir. Şerit ters çevrilmiş kart,
+   o yüzden düğme kartın kendi mürekkebini miras alıyor. */
+.mud button{appearance:none;border:0;background:none;font:inherit;color:inherit;
+  cursor:pointer;padding:0}
+.mud .one{line-height:2.2}
+/* Karar 59, dördüncü yer: kendi ismin Müdavim şeridinde de işaretli.
+   Şerit ters çevrilmiş mürekkep kart; yeşil yüzey o kartta da 5,4:1 üstüne açık yazı
+   taşıyor ve yüzey kartın beyazından 5,4:1 ayrılıyor. */
+.mud .me{background:var(--me);color:var(--ink);padding:2px 6px;border-radius:2px;opacity:1}
+
+/* Sıralı liste: kare eşlikli (seçim B). Etkinlik galerisiyle aynı kalıp. */
+.row{border-top:1px solid var(--rule);min-height:48px;display:flex;align-items:center;gap:10px;
+  padding:7px 0;cursor:pointer;background:none;border-left:0;border-right:0;border-bottom:0;
+  width:100%;text-align:left;color:inherit;font:inherit;appearance:none}
+.row .no{font-size:15px;line-height:1;color:var(--faint);width:15px;flex:0 0 auto;
+  font-variation-settings:"wdth" 68,"wght" 900;font-variant-numeric:tabular-nums}
+.row img{width:44px;height:44px;object-fit:cover;flex:0 0 auto;background:#17171A;display:block}
+.row .nm{font-size:12.5px;font-weight:900;text-transform:uppercase;letter-spacing:.01em;
+  line-height:1.2;overflow-wrap:anywhere;min-width:0}
+.row .av{margin-left:auto;font-size:16px;letter-spacing:-.02em;flex:0 0 auto;
+  font-variation-settings:"wdth" 72,"wght" 900;font-variant-numeric:tabular-nums}
+/* Karar 59: kendi satırın, soldan yeşil kenar */
+.row.me{box-shadow:inset 3px 0 0 var(--me);padding-left:9px}
+
+/* Sırasız blok: düz metin akışı. Satır hâline getirmek sıralıymış gibi okutur. */
+.unr{margin-top:16px;border-top:4px solid var(--ink);padding-top:11px}
+.unr .hd{font-size:9px;font-weight:800;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--faint);line-height:1.5}
+/* Satır aralığı 2,8: her isim ~34px dokunma hedefi. 2'de 24px kalıyordu, kural 48px.
+   4'e çıkarmak 48'i karşılardı ama aralar açılınca blok yeniden liste gibi okunuyor,
+   kaçındığımız şey oydu. 2,8 taşma ya da üst üste binme yapmadan en fazlasını veriyor. */
+.unr .names{margin-top:10px;font-size:12px;font-weight:900;text-transform:uppercase;
+  letter-spacing:.01em;color:var(--dim);line-height:2.8}
+.unr .names button{appearance:none;border:0;background:none;font:inherit;color:inherit;
+  cursor:pointer;margin-right:9px;padding:0}
+.unr .names button.me{background:var(--me);color:var(--ink);padding:2px 6px;border-radius:2px}
+
+/* ================= PROFİL ================= */
+.back{appearance:none;border:0;background:none;font:inherit;color:var(--faint);cursor:pointer;
+  font-size:9px;font-weight:800;letter-spacing:.2em;text-transform:uppercase;padding:0;
+  min-height:24px;display:flex;align-items:center}
+.pname{font-size:29px;line-height:.86;letter-spacing:-.035em;text-transform:uppercase;margin-top:12px;
+  font-variation-settings:"wdth" 70,"wght" 900;overflow-wrap:anywhere}
+.since{font-size:9px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--faint);margin-top:8px;line-height:1.6}
+.stats{display:flex;margin-top:13px;border-top:1px solid var(--rule);border-bottom:1px solid var(--rule)}
+/* Dikey pay: 22px rakamlar için 10px azdı, sayı üstteki saç teline yapışıyordu.
+   Yatay pay: içerik hücre kenarından 0px içerideydi, yani 2. ve 3. sütunun rakamları
+   dikey çizginin dibine yapışıyordu. 1. sütun sadece sayfa payı sayesinde iyi
+   duruyordu. Şimdi her çizginin iki yanında 12px var. */
+.stats div{flex:1;padding:14px 12px 15px 0;border-right:1px solid var(--rule)}
+.stats div + div{padding-left:12px}
+.stats div:last-child{border-right:0;padding-right:0}
+.stats b{display:block;font-size:22px;letter-spacing:-.03em;
+  font-variation-settings:"wdth" 70,"wght" 900;font-variant-numeric:tabular-nums}
+.stats.zero b{color:var(--faint)}
+.stats span{display:block;font-size:8px;font-weight:800;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--faint);margin-top:6px}
+
+/* Katkı işaretleri: çerçeveli, renksiz, 2px (karar 61) */
+.badges{display:flex;flex-direction:column;gap:7px}
+.badge{border:1px solid var(--rule);border-radius:2px;padding:9px 11px 10px}
+.badge b{display:block;font-size:11.5px;font-weight:900;text-transform:uppercase;letter-spacing:.03em}
+.badge span{display:block;font-size:9.5px;line-height:1.5;color:var(--faint);margin-top:4px}
+
+/* Çekim tarifi: kamera verisinden, en az 3 kare (karar 57) */
+.habit{border-top:1px solid var(--rule);display:flex;align-items:baseline;gap:10px;padding:9px 0}
+.habit .k{font-size:8.5px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--faint);width:82px;flex:0 0 auto}
+.habit .v{font-size:12.5px;font-weight:900;text-transform:uppercase;letter-spacing:.01em}
+.habit .n{margin-left:auto;font-size:8.5px;font-weight:800;letter-spacing:.12em;
+  text-transform:uppercase;color:var(--faint);font-variant-numeric:tabular-nums;text-align:right}
+
+/* Satır arası sütun arasından çok daha geniş. Eşit olduğunda künye kendi karesinden
+   5px, alttaki kareden 3px uzakta kalıyordu ve yazı bir alttaki fotoğrafa aitmiş gibi
+   okunuyordu. Grup içi 5px, gruplar arası 18px: yakınlık artık doğru şeyi söylüyor. */
+.grid{display:grid;grid-template-columns:repeat(3,1fr);column-gap:8px;row-gap:18px}
+.grid figure{margin:0}
+.grid img{width:100%;height:92px;object-fit:cover;display:block;background:#17171A}
+/* Karar 59: kendi karen, yeşil çerçeve. ETKİNLİK GALERİSİ için, profil için değil:
+   kendi profilinde zaten her kare senin, işaret ayırt etmiyor.
+   Teknik not: `inset box-shadow` bir <img> üstünde görüntünün ARKASINA çizilir,
+   opak fotoğrafta hiç görünmez. Bu yüzden outline kullanılıyor. */
+.grid figure.me img{outline:3px solid var(--me);outline-offset:-3px}
+/* Künye yüksekliği SABİT. Serbest bırakılınca puanlı kutu 12px, puansız 9px oluyordu
+   ve baseline hizası 8px etiketi 11px puanın taban çizgisine çekip aşağı düşürüyordu:
+   aynı satırdaki "SOKAK 7,9" ile "PORTRE" aynı hizada durmuyordu. */
+/* TABAN ÇİZGİSİ hizası. flex-end kutu altlarını hizalıyordu ama harflerin görünür
+   tabanı kutu altından yukarıda (8px etikette ~1,6px, 11px puanda ~2,2px): çubuk
+   yazıdan sarkıyor, puan ile etiket de birbirine göre 0,6px kayıyordu.
+   baseline hizası üçünü de aynı çizgiye oturtuyor; yazısı olmayan çubuk için
+   flexbox alt kenarını taban çizgisi sayıyor, yani çubuk çizginin üstüne oturuyor. */
+.grid figcaption{margin-top:5px;height:12px;font-size:8px;font-weight:800;letter-spacing:.12em;
+  text-transform:uppercase;color:var(--faint);display:flex;align-items:baseline;gap:5px;
+  line-height:1}
+/* Puan kendi etiketinin YANINDA. Sağa itildiğinde kendi adından kopuyor ve bir sonraki
+   kolonun adına yapışıyordu: "SOKAK ... 7,9 PORTRE" diye okunuyordu. */
+.grid figcaption b{font-size:11px;line-height:1;color:var(--ink);
+  letter-spacing:-.01em;font-variation-settings:"wdth" 72,"wght" 900;font-variant-numeric:tabular-nums}
+/* Sıralamaya giren karenin izi: ince mürekkep çubuk + parlak tema adı.
+   Puanın varlığı tek başına yetmiyordu, "neden bunun puanı var da bunun yok"
+   sorusu cevapsız kalıyordu (parça 1 spec'i bu riski zaten işaretlemişti).
+   Çubuk uygulamanın 4px ayraç dilinin küçültülmüş hâli, yeni bir simge değil.
+   Karar 38: SIRA hiçbir profilde gösterilmiyor, sadece girip girmediği. */
+.grid figcaption i{width:2px;height:9px;background:var(--ink);display:block;flex:0 0 auto}
+.grid figure.sirali figcaption{color:var(--dim)}
+.gridnot{margin-top:9px;font-size:9px;font-weight:800;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--faint);line-height:1.6}
+
+/* Ayarlar: sadece kendi profilinde */
+.setrow{border-top:1px solid var(--rule);display:flex;align-items:flex-start;gap:11px;
+  padding:12px 0;min-height:48px;cursor:pointer}
+/* Onay kutusu: boşken çerçeve, işaretliyken dolu blok + TİK.
+   İki deneme elendi. Önce dolu kutunun ortasına koyu bir kare konmuştu, o "işaretli"
+   değil "boş" ya da "belirsiz" diye okunuyordu. Sonra sade dolu blok denendi, o da
+   "işaretli" demiyordu; karşılaştıracak ikinci bir kutu olmadığı için dolu kare tek
+   başına bir durum bildirmiyor.
+   Tik, uydurduğum "ikon yok" kısıtı yüzünden baştan reddedilmişti. Öyle bir kural
+   yok: spec "metin çok az" diyor, bu tipografi hakkında; sekme çubuğunda zaten üç
+   işaret var. Geçerli ayrım şu: işaret bir DURUM ya da YÖN söylüyorsa var, bir şeyi
+   resmediyorsa yok. */
+.box{width:20px;height:20px;flex:0 0 auto;border:1px solid var(--ink);border-radius:2px;
+  margin-top:1px;background:transparent;position:relative}
+.box.on{background:var(--ink)}
+/* Tik kutunun merkezine göre konumlanıyor: önce sabit piksel verilmişti ve
+   döndürmeden sonra sola aşağı kaçıyordu. */
+.box.on::after{content:'';position:absolute;left:50%;top:46%;width:5px;height:9px;
+  border:solid var(--paper);border-width:0 2px 2px 0;
+  transform:translate(-50%,-50%) rotate(45deg)}
+.setrow .tx b{display:block;font-size:11.5px;font-weight:900;text-transform:uppercase;letter-spacing:.02em}
+.setrow .tx span{display:block;font-size:9.5px;line-height:1.55;color:var(--faint);margin-top:4px}
+.out{margin-top:14px;border:1px solid var(--rule);border-radius:2px;min-height:48px;
+  display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:900;
+  letter-spacing:.18em;text-transform:uppercase;color:var(--dim);cursor:pointer}
+
+/* ================= ETKİNLİKLER ================= */
+.next{margin-top:14px;padding:13px 0;border-top:4px solid var(--ink);
+  border-bottom:1px solid var(--rule);display:flex;align-items:baseline;gap:10px}
+.next .k{font-size:9px;font-weight:800;letter-spacing:.2em;text-transform:uppercase;color:var(--faint)}
+.next .v{margin-left:auto;font-size:22px;letter-spacing:-.03em;
+  font-variation-settings:"wdth" 70,"wght" 900;font-variant-numeric:tabular-nums}
+.next .u{font-size:9px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:var(--faint)}
+.ev{border-top:1px solid var(--rule);padding:12px 0 13px}
+.ev .top{display:flex;align-items:baseline;gap:10px}
+.ev .no{font-size:21px;line-height:1;letter-spacing:-.03em;color:var(--faint);
+  font-variation-settings:"wdth" 68,"wght" 900;font-variant-numeric:tabular-nums;width:30px;flex:0 0 auto}
+.ev .mo{font-size:17px;font-weight:900;text-transform:uppercase;letter-spacing:.01em;
+  font-variation-settings:"wdth" 76,"wght" 900}
+.ev .ct{margin-left:auto;font-size:9px;font-weight:800;letter-spacing:.12em;
+  text-transform:uppercase;color:var(--faint)}
+.ev .wins{display:flex;gap:3px;margin-top:11px}
+.ev .wins figure{margin:0;flex:1;min-width:0}
+.ev .wins img{width:100%;height:96px;object-fit:cover;display:block;background:#17171A}
+.ev .wins figcaption b{display:block;font-size:8px;font-weight:800;letter-spacing:.18em;
+  text-transform:uppercase;color:var(--faint);margin-top:6px}
+/* Karar 50: isim kesilmez, iki satıra sarar, yer baştan ayrılır */
+.ev .wins figcaption span{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;
+  overflow:hidden;font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:.01em;
+  margin-top:3px;line-height:1.2;min-height:26px;overflow-wrap:anywhere}
+.ev[data-t="3"] .wins figcaption span.uzun{font-size:9.5px;line-height:1.25}
+
+/* ---------- sekmeler ---------- */
+.tabs{flex:0 0 auto;display:grid;grid-template-columns:repeat(3,1fr);border-top:1px solid var(--rule)}
+.tabs button{
+  appearance:none;border:0;border-right:1px solid var(--rule);background:none;font:inherit;
+  min-height:48px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;
+  font-size:8.5px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--faint);cursor:pointer;
+}
+.tabs button:last-child{border-right:0}
+/* Karar 47: "ışıklar açık" hâli, aşama rengi yok. Aktif sekme mürekkep. Işımaz (karar 60). */
+.tabs button.on{background:var(--ink);color:var(--paper)}
+/* İşaretler: Ikonate (MIT, github.com/mikolajdobrucki/ikonate) taban.
+   Sadece hiçbir sette bulunmayan foto-özgü işaret elle çizildi: perforasyonlu film
+   karesi. Ikonate'in kendi "film" ikonu video kamera gibi duruyor, kulübün işini
+   yanlış anlatıyordu.
+   Gömülü stroke-linecap="round" nitelikleri CSS ile eziliyor: uçlar ve köşeler
+   keskin, radius 0 diliyle aynı hizada. */
+.tabs .ic{line-height:1;height:17px;display:flex;align-items:center}
+.tabs .ic svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:1.6}
+.tabs .ic svg *{stroke-linecap:butt;stroke-linejoin:miter}
+.back svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:1.8;margin-right:7px}
+.back svg *{stroke-linecap:butt;stroke-linejoin:miter}
+
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{transition-duration:.001ms!important}}
+</style>
+</head>
+<body>
+
+<div class="tools" id="tools"></div>
+<div class="device">
+  <div class="scroll" id="screen"></div>
+  <div class="tabs" id="tabs"></div>
+</div>
+
+<script>
+/* ---------------- veri ---------------- */
+const BEN_VARSAYILAN = 'Ece Tan';
+/* Oturum açan kişi senaryoya göre değişiyor: yeni üye senaryosunda sen Derya Sav'sın.
+   Sabit BEN kullanınca Sıralama sekmesi o senaryoda yanlış kişiyi işaretliyordu. */
+const ben = () => S.senaryo==='yeni' ? 'Derya Sav' : BEN_VARSAYILAN;
+
+const TOP = [
+  {n:'Ayşe Kaya',                a:'8,4', e:'6 kare · 3 etkinlik'},
+  {n:'Deniz Yılmaz',             a:'8,2', e:'8 kare · 4 etkinlik'},
+  {n:'Zeynep Aleyna Çetinkaya',  a:'8,0', e:'5 kare · 3 etkinlik'},   /* uzun isim testi */
+  {n:'Mert Demir',               a:'7,9', e:'7 kare · 4 etkinlik'},
+  {n:'Abdurrahman Karaosmanoğlu',a:'7,8', e:'6 kare · 3 etkinlik'},   /* en uzun */
+];
+const REST = ['Can Öz','Selin Arı','Ece Tan','Barış Ak','Elif Sunar','Kaan Uz','Melis Ay',
+  'Onur Tek','Pelin Er','Sinan Gül','Tuna Kara','Yasemin Ok','Berk Alp','Derya Sav','Emre Toz'];
+
+const MUDAVIM_AZ  = ['Can Öz','Selin Arı','Barış Ak'];
+const MUDAVIM_COK = ['Ayşe Kaya','Can Öz','Selin Arı','Barış Ak','Deniz Yılmaz','Elif Sunar',
+  'Kaan Uz','Melis Ay','Onur Tek','Pelin Er','Sinan Gül','Tuna Kara','Mert Demir','Ece Tan'];
+
+const TEMALAR = ['Sokak','Portre','Gece','Su','Gölge','Yol','Yeşil','Kalabalık','Kapı','El','İlk'];
+const AYLAR   = ['Eylül','Eylül','Eylül','Temmuz','Temmuz','Mayıs','Mayıs','Mayıs','Mart','Mart','Ocak'];
+
+const slug = s => s.toLowerCase().replace(/[^a-z0-9]/g,'');
+
+/* Bir kişinin kareleri. Puan kuralı (karar 52): sadece sıralamaya girenlerde puan var,
+   kendi profilinde hepsinde var (karar 38). */
+function kareler(ad){
+  const n = ad===ben() ? 6 : 11;
+  return Array.from({length:n},(_,i)=>({
+    tema: TEMALAR[i], ay: AYLAR[i],
+    seed: `${slug(ad)}-${i}`,
+    puan: (7.9 - i*0.12).toFixed(1).replace('.',','),
+    sirali: i % 3 === 0,
+  }));
+}
+
+/* ---------------- durum ---------------- */
+const S = { tab:'siralama', kisi:null, senaryo:'dolu', afis:true };
+
+const SENARYO = [
+  {k:'dolu',      ad:'Normal'},
+  {k:'kilitli',   ad:'Sonuç yok'},
+  {k:'kalabalik', ad:'Müdavim 14 kişi'},
+  {k:'yeni',      ad:'Yeni üye'},
+];
+
+/* ---------------- Sıralama ---------------- */
+function siralama(){
+  const kilitli = S.senaryo==='kilitli';
+  const mud = S.senaryo==='kalabalik' ? MUDAVIM_COK : MUDAVIM_AZ;
+
+  const head = `
+    <div class="mast"><span>Creatographers</span><span class="r">20 üye</span></div>
+    <div class="rb"></div>
+    <div class="seas"><h2>Sezon ${kilitli?'01':'02'}</h2>
+      <span class="of">${kilitli?'0':(S.senaryo==='kalabalik'?'6':'3')} / 6 etkinlik</span></div>
+    <div class="prog">${Array.from({length:6},(_,i)=>{
+      const dolu = kilitli ? 0 : (S.senaryo==='kalabalik' ? 6 : 3);
+      return `<i class="${i<dolu?'on':''}"></i>`;}).join('')}</div>`;
+
+  if(kilitli){
+    return head + `
+      <div class="sec">Sezon sıralaması</div>
+      <div class="empty"><b>İlk sonuçlarla açılıyor</b>
+        <span>Kasım etkinliğinin oylaması kapanınca sıralama burada başlıyor.<br>
+        Oylamaya 2 gün kaldı.</span></div>
+      <div class="sec">Müdavim</div>
+      <div class="empty"><b>Sonuçlarla birlikte</b>
+        <span>Kimin katıldığı oylama sürerken açılmıyor, yoksa karelerin sahibi
+        tahmin edilebilir hale gelir.</span></div>
+      <div class="sec">Geçen sezon</div>
+      <div class="empty"><b>Henüz yok</b><span>Bu kulübün ilk sezonu.</span></div>`;
+  }
+
+  /* Müdavim şeridi: tek kişi ise adı iri, çoğulsa önce sayı sonra isimler */
+  /* Karar 59: isim nerede geçerse geçsin aynı işaret, şerit dahil. */
+  const isim = n => n===ben()
+    ? `<button class="me" data-kisi="${n}">${n}</button>`
+    : `<button data-kisi="${n}">${n}</button>`;
+  const dizi = mud.map(isim).join(' · ');
+  const mudBlok = mud.length <= 4
+    ? `<div class="mud"><div class="k">Müdavim<span>son 6 etkinlik · 6/6</span></div>
+         <div class="one">${dizi}</div></div>`
+    : `<div class="mud"><div class="k">Müdavim<span>son 6 etkinlik · 6/6</span></div>
+         <div class="big">${mud.length} kişi</div>
+         <div class="list">${dizi}</div></div>`;
+
+  return head + mudBlok + `
+    <div class="sec">Sezon sıralaması<span>ilk ${TOP.length}</span></div>
+    ${TOP.map((p,i)=>`
+      <button class="row ${p.n===ben()?'me':''}" data-kisi="${p.n}">
+        <span class="no">${i+1}</span>
+        <img src="https://picsum.photos/seed/${slug(p.n)}-0/200/200" alt="">
+        <span class="nm">${p.n}</span>
+        <span class="av">${p.a}</span>
+      </button>`).join('')}
+    <div class="unr">
+      <div class="hd">Sezonda kare veren diğer isimler<br>sırasız</div>
+      <div class="names">${REST.map(n=>
+        `<button class="${n===ben()?'me':''}" data-kisi="${n}">${n}</button>`).join('')}</div>
+    </div>`;
+}
+
+/* ---------------- Profil ---------------- */
+function profil(){
+  const yeni  = S.senaryo==='yeni' && !S.kisi;
+  /* Yeni üye senaryosunda oturum açan kişi Derya Sav. Önce künye BEN'i, gövde
+     Derya Sav'ı yazıyordu; aynı ekranda iki farklı kişi görünüyordu. */
+  const ad    = S.kisi || ben();
+  const benim = ad === ben();
+
+  const ust = S.kisi
+    ? `<button class="back" id="geri">${IC_GERI}Sezon sıralaması</button><div class="rb"></div>`
+    : `<div class="mast"><span>Profilin</span><span class="r">${ad}</span></div><div class="rb"></div>`;
+
+  if(yeni){
+    return ust + `
+      <h2 class="pname">${ad}</h2>
+      <div class="since">Bu ay katıldın · henüz etkinliğin yok</div>
+      <div class="stats zero"><div><b>0</b><span>Etkinlik</span></div>
+        <div><b>0</b><span>Kare</span></div><div><b>0</b><span>Seri</span></div></div>
+      <div class="sec">Karelerin</div>
+      <div class="empty"><b>Henüz kare yok</b>
+        <span>Ocak etkinliğinde ilk karen buraya gelecek.<br>Yükleme 34 gün sonra açılıyor.</span></div>
+      <div class="sec">Katkı</div>
+      <div class="empty"><b>İlk etkinlikten sonra</b>
+        <span>Katkı işaretleri hangi temalara kare verdiğine bakıyor,
+        o yüzden ilk etkinliğini bekliyor.</span></div>
+      <div class="sec">Nasıl çekiyorsun</div>
+      <div class="empty"><b>Üç kareden sonra</b>
+        <span>Çekim tarifi en az üç kareye bakarak çıkarılıyor. Daha azı yanıltıcı olurdu.</span></div>
+      ` + ayarlar();
+  }
+
+  const K = kareler(ad);
+  /* Kulübün ilk sezonu ve hiç sonuç açılmamış: kişi kare yüklemiş ama hiçbir etkinlik
+     tamamlanmamış. Puan, katkı işareti ve çekim tarifi ancak sonuçlarla doğar.
+     Davranış testinde yakalandı: Sıralama senaryoya uyuyordu, Profil uymuyordu. */
+  const sonucYok = S.senaryo==='kilitli';
+  const etkinlik = sonucYok ? 0 : (benim ? 4 : 5);
+  const seri     = sonucYok ? 0 : (benim ? 2 : 3);
+
+  return ust + `
+    <h2 class="pname">${ad}</h2>
+    <div class="since">${sonucYok
+      ? 'Kulübün ilk etkinliğinden · sonuçlar henüz açılmadı'
+      : (benim?"Mart 2025'ten beri · 4. etkinlikten":"Ocak 2025'ten beri · kulübün ilk etkinliğinden")}</div>
+    <div class="stats">
+      <div><b>${etkinlik}</b><span>Etkinlik</span></div>
+      <div><b>${K.length}</b><span>Kare</span></div>
+      <div><b>${seri}</b><span>Seri</span></div>
+    </div>
+
+    <div class="sec">Katkı</div>
+    ${sonucYok
+      ? `<div class="empty"><b>Sonuçlarla açılıyor</b>
+           <span>Katkı işaretleri hangi temalara kare verdiğine bakıyor, ama ancak
+           sonuçlar açılınca hesaplanıyor.</span></div>`
+      : `<div class="badges">
+      <div class="badge"><b>Tam set</b>
+        <span>Katıld${benim?'ığın':'ığı'} her etkinlikte bütün temalara kare ver${benim?'din':'di'}.</span></div>
+      ${benim?'':`<div class="badge"><b>On bir tema</b>
+        <span>On bir farklı temada kare verdi. Kulüpteki en geniş tema aralığı.</span></div>`}
+    </div>`}
+
+    <div class="sec">Nasıl çekiyor${benim?'sun':''}<span>${sonucYok?'':'kamera bilgisinden'}</span></div>
+    ${sonucYok
+      ? `<div class="empty"><b>Sonuçlarla açılıyor</b>
+           <span>Kamera bilgisi oylama boyunca kapalı kalıyor (karar 24).</span></div>`
+      : `<div class="habit"><span class="k">En çok</span><span class="v">${benim?'50mm':'35mm'}</span>
+      <span class="n">${K.length} karenin ${benim?4:7}'si</span></div>
+    <div class="habit"><span class="k">Diyafram</span><span class="v">${benim?'Orta':'Genelde açık'}</span>
+      <span class="n">${benim?'f/4 – f/8':'f/1.8 – f/2.8'}</span></div>
+    <div class="habit"><span class="k">Işık</span><span class="v">${benim?'Gündüz':'Alacakaranlık'}</span>
+      <span class="n">${benim?'ISO 100 – 400':'ISO 800 ve üstü'}</span></div>`}
+
+    <div class="sec">${benim?'Karelerin':'Kareleri'}<span>${
+      sonucYok ? K.length+' kare · puanlar sonuçlarla'
+               : K.filter(k=>k.sirali).length+' karesi sıralamaya girdi'}</span></div>
+    <div class="grid">
+      ${K.map(k=>`<figure class="${(!sonucYok&&k.sirali)?'sirali':''}">
+        <img src="https://picsum.photos/seed/${k.seed}/300/300" alt="">
+        <figcaption>${(!sonucYok&&k.sirali)?'<i></i>':''}${k.tema}${
+          (!sonucYok&&(benim||k.sirali))?`<b>${k.puan}</b>`:''}</figcaption>
+      </figure>`).join('')}
+    </div>
+    ${benim&&!sonucYok?'<div class="gridnot">Ortalamaların sadece sana görünür.</div>':''}
+    ` + (benim ? ayarlar() : '');
+}
+
+function ayarlar(){
+  return `
+    <div class="sec">Ayarlar</div>
+    <div class="setrow" id="afis">
+      <span class="box ${S.afis?'on':''}"></span>
+      <span class="tx"><b>Kulüp afişi</b>
+        <span>Kazanırsam karem kulüp afişinde kullanılabilir.</span></span>
+    </div>
+    <div class="out">Çıkış yap</div>`;
+}
+
+/* ---------------- Etkinlikler (kısa arşiv) ---------------- */
+const GECMIS = [
+  {no:'05', ay:'Eylül',  t:[['Sokak','Ayşe Kaya'],['Portre','Deniz Yılmaz'],['Gece','Zeynep Aleyna Çetinkaya']]},
+  {no:'04', ay:'Temmuz', t:[['Su','Mert Demir'],['Gölge','Abdurrahman Karaosmanoğlu']]},
+  {no:'03', ay:'Mayıs',  t:[['Yol','Deniz Yılmaz'],['Yeşil','Ayşe Kaya'],['Kalabalık','Can Öz']]},
+];
+function etkinlikler(){
+  return `
+    <div class="mast"><span>Creatographers</span><span class="r">20 üye</span></div>
+    <div class="rb"></div>
+    <div class="next"><span class="k">Sıradaki · Ocak</span>
+      <span class="v">34</span><span class="u">gün</span></div>
+    <div class="sec">Geçmiş etkinlikler<span>${GECMIS.length} etkinlik</span></div>
+    ${GECMIS.map(e=>`
+      <div class="ev" data-t="${e.t.length}">
+        <div class="top"><span class="no">${e.no}</span><span class="mo">${e.ay}</span>
+          <span class="ct">${e.t.length} tema</span></div>
+        <div class="wins">${e.t.map(([tema,kim],i)=>`
+          <figure>
+            <img src="https://picsum.photos/seed/${slug(kim)}-${i}/420/320" alt="">
+            <figcaption><b>${tema}</b>
+              <span class="${kim.length>18?'uzun':''}">${kim}</span></figcaption>
+          </figure>`).join('')}</div>
+      </div>`).join('')}`;
+}
+
+/* ---------------- çizim ---------------- */
+const svg = p => `<svg viewBox="0 0 24 24">${p}</svg>`;
+/* Etkinlikler: perforasyonlu film karesi (bizim). Sıralama ve Profil: Ikonate. */
+const IC_FILM   = svg('<rect x="2" y="6" width="20" height="12"/><rect x="4" y="2.5" width="3" height="2" fill="currentColor" stroke="none"/><rect x="10.5" y="2.5" width="3" height="2" fill="currentColor" stroke="none"/><rect x="17" y="2.5" width="3" height="2" fill="currentColor" stroke="none"/><rect x="4" y="19.5" width="3" height="2" fill="currentColor" stroke="none"/><rect x="10.5" y="19.5" width="3" height="2" fill="currentColor" stroke="none"/><rect x="17" y="19.5" width="3" height="2" fill="currentColor" stroke="none"/>');
+const IC_CHART  = svg('<polygon points="2 12 2 21 6 21 6 12"/> <polygon points="18 7 18 21 22 21 22 7"/> <polygon points="10 3 10 21 14 21 14 3"/>');
+const IC_PERSON = svg('<path d="M4,20 C4,17 8,17 10,15 C11,14 8,14 8,9 C8,5.667 9.333,4 12,4 C14.667,4 16,5.667 16,9 C16,14 13,14 14,15 C16,17 20,17 20,20"/>');
+const IC_GERI   = svg('<path d="M9 6l-6 6 6 6"/> <path d="M21 12H4"/> <path stroke-linecap="round" d="M3 12h1"/>');
+
+const TABS = [
+  {k:'etkinlikler', ic:IC_FILM,   ad:'Etkinlikler'},
+  {k:'siralama',    ic:IC_CHART,  ad:'Sıralama'},
+  {k:'profil',      ic:IC_PERSON, ad:'Profil'},
+];
+
+function ciz(){
+  const scr = document.getElementById('screen');
+  scr.innerHTML = S.tab==='siralama' ? siralama()
+                : S.tab==='profil'   ? profil()
+                : etkinlikler();
+  scr.scrollTop = 0;
+
+  document.getElementById('tabs').innerHTML = TABS.map(t=>
+    `<button class="${t.k===S.tab?'on':''}" data-tab="${t.k}">
+       <span class="ic">${t.ic}</span>${t.ad}</button>`).join('');
+
+  document.getElementById('tools').innerHTML =
+    `<span class="lbl">Durum</span>` + SENARYO.map(s=>
+      `<button class="${s.k===S.senaryo?'on':''}" data-sen="${s.k}">${s.ad}</button>`).join('');
+}
+
+/* Karar 58: isme nereden dokunulursa dokunulsun aynı profil açılıyor. */
+document.addEventListener('click', e=>{
+  const tab = e.target.closest('[data-tab]');
+  if(tab){ S.tab = tab.dataset.tab; S.kisi = null; return ciz(); }
+
+  const sen = e.target.closest('[data-sen]');
+  if(sen){
+    S.senaryo = sen.dataset.sen; S.kisi = null;
+    if(S.senaryo==='yeni') S.tab='profil';
+    if(S.senaryo==='kilitli' || S.senaryo==='kalabalik') S.tab='siralama';
+    return ciz();
+  }
+
+  const kisi = e.target.closest('[data-kisi]');
+  if(kisi){
+    const ad = kisi.dataset.kisi;
+    S.kisi = (ad===ben()) ? null : ad;   /* kendine dokununca kendi profilin (ayarlı) */
+    S.tab = 'profil';
+    return ciz();
+  }
+
+  if(e.target.closest('#geri')){ S.kisi=null; S.tab='siralama'; return ciz(); }
+  if(e.target.closest('#afis')){ S.afis = !S.afis; return ciz(); }
+});
+
+ciz();
+</script>
+</body>
+</html>
