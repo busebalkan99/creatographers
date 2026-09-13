@@ -95,6 +95,19 @@ body{background:#050506;color:var(--ink);font-family:"Archivo",system-ui,sans-se
 .uyari{margin-top:12px;border:1px dashed var(--rule);padding:12px 13px;
   font-size:11px;font-weight:800;letter-spacing:.04em;color:var(--soft);line-height:1.55}
 
+/* ---- elle tema girişi (karar 85) ---- */
+/* Havuz asıl yol, bu ikinci yol; o yüzden listenin ALTINDA ve kendi bölüm
+   başlığıyla ayrılıyor, havuz satırlarına karışmıyor. */
+.elle{margin-top:4px}
+.elle input{width:100%;background:transparent;color:var(--ink);font:inherit;
+  font-size:15px;font-weight:900;letter-spacing:.01em;text-transform:uppercase;
+  border:0;border-bottom:1px solid var(--rule);padding:13px 0 15px;outline:none;
+  font-variation-settings:"wdth" 76,"wght" 900}
+.elle input:focus{border-bottom-color:var(--ink)}
+.elle .ekle{margin-top:14px;height:44px;width:100%;appearance:none;border:0;cursor:pointer;
+  background:transparent;box-shadow:inset 0 0 0 2px var(--ink);color:var(--ink);font:inherit;
+  font-size:11px;font-weight:800;letter-spacing:.2em;text-transform:uppercase;border-radius:2px}
+
 /* ---- ayar satırı (süre, çekim şartı) ---- */
 .ayar{border-top:1px solid var(--rule);padding:14px 0;display:flex;align-items:center;gap:12px}
 .ayar .tx{min-width:0;flex:1}
@@ -138,6 +151,15 @@ body{background:#050506;color:var(--ink);font-family:"Archivo",system-ui,sans-se
   text-transform:uppercase;color:var(--soft)}
 .uye .rozet.bekliyor{background:var(--yukle);color:var(--ink);padding:3px 8px;border-radius:2px}
 
+/* Karar 86: kurucu safelight yeşili (kimlik işareti, karar 59 ile aynı dil),
+   yönetici çerçeveli, üye sade. Üç rol üç farklı ağırlıkta duruyor. */
+.uye .rozet.kurucu{background:var(--me);color:var(--ink);padding:3px 8px;border-radius:2px}
+.uye .rozet.yonetici{box-shadow:inset 0 0 0 1px var(--rule);padding:3px 8px;border-radius:2px;color:var(--ink)}
+.rolakt{padding:0 0 13px}
+.rolakt button{appearance:none;border:0;cursor:pointer;height:44px;padding:0 14px;border-radius:2px;
+  background:transparent;box-shadow:inset 0 0 0 1px var(--rule);color:var(--soft);font:inherit;
+  font-size:11px;font-weight:800;letter-spacing:.2em;text-transform:uppercase}
+
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{transition-duration:.001ms!important}}
 </style>
 </head>
@@ -171,6 +193,16 @@ const HAVUZ = [
 ];
 let secili = new Set(['Gece','Eller']);
 
+/* Karar 86: üç rol. Bu prototipte sen kurucusun, o yüzden rol değiştirme
+   düğmeleri görünüyor; yönetici olsaydın görünmezdi. */
+const UYELER = [
+  {ad:'Deniz Akın',  mail:'deniz.akin@example.com', rol:'bekliyor'},
+  {ad:'Ayşe Kaya',   mail:'ayse@example.com',       rol:'kurucu', ben:true},
+  {ad:'Mert Demir',  mail:'mert@example.com',       rol:'yonetici'},
+  {ad:'Selin Arı',   mail:'selin@example.com',      rol:'uye'},
+  {ad:'Can Öz',      mail:'can@example.com',        rol:'uye'},
+];
+
 const EKRAN = {
 
   giris: {
@@ -179,9 +211,9 @@ const EKRAN = {
       <div class="sec">Profilin<span>Ayşe Kaya</span></div>
       <div class="rol">
         <span class="lab">Rolün</span>
-        <h3>Kulüp yöneticisi</h3>
+        <h3>Kulüp kurucusu</h3>
         <p class="veri">Etkinliği ve tarihleri sen kuruyorsun, temaları havuzdan seçiyorsun,
-           aşamaları gerektiğinde elle çevirebiliyorsun.</p>
+           aşamaları elle çevirebiliyorsun. Yöneticileri de yalnız sen ekliyorsun (karar 86).</p>
         <div class="act" data-git="temalar">Yönetim</div>
       </div>
       <div class="sec">Bekleyen<span>2 iş</span></div>
@@ -207,9 +239,17 @@ const EKRAN = {
           <div class="gov">
             <div class="ad">${o.ad}</div>
             ${o.neden ? `<div class="neden">${o.neden}</div>` : ''}
-            <div class="kim">${o.kim}${o.bekleyen ? ` · ${o.bekleyen} etkinliktir havuzda` : ' · yeni'}</div>
+            <div class="kim">${o.elle ? 'Yönetici yazdı · havuzdan değil' : o.kim + (o.bekleyen ? ` · ${o.bekleyen} etkinliktir havuzda` : ' · yeni')}</div>
           </div>
         </div>`).join('')}
+      <div class="sec">Havuzda yoksa<span>karar 85</span></div>
+      <div class="elle">
+        <label class="lab" for="elleAd">Temayı kendin yaz</label>
+        <input id="elleAd" placeholder="ÖRNEK: KIŞ BULUŞMASI" maxlength="24">
+        <div class="veri" style="margin-top:9px">Havuzda o etkinliğe uyan bir şey yoksa
+          ya da tarih belirli bir temayı gerektiriyorsa. Elle girilen tema da 3 sınırına dahil.</div>
+        <button class="ekle" data-elle>Listeye ekle</button>
+      </div>
       <div class="sayac">
         <b>Seçilen</b><span class="v">${secili.size} / 3</span>
       </div>
@@ -272,31 +312,23 @@ const EKRAN = {
   },
 
   uyeler: {
-    not:'Karar 2: davetli liste. Yönetici e-posta adreslerini onaylıyor, sadece o adresler Google ile girebiliyor.',
+    not:'Karar 86: üç rol var. Kurucu yöneticileri ekler ve çıkarır, yönetici ekleyemez. Karar 2 (davetli liste) yöneticide kalıyor, kurucuya özel değil. Bu ekran kurucunun gözünden.',
     ciz: () => KUNYE + `
       <div class="sec">Üyeler<span>20 üye</span></div>
-      <div class="uye">
-        <div class="tx"><b>Deniz Akın</b><span>deniz.akin@example.com</span></div>
-        <span class="rozet bekliyor">Bekliyor</span>
-      </div>
-      <div class="uye">
-        <div class="tx"><b>Ayşe Kaya</b><span>ayse@example.com · yönetici</span></div>
-        <span class="rozet">Üye</span>
-      </div>
-      <div class="uye">
-        <div class="tx"><b>Mert Demir</b><span>mert@example.com</span></div>
-        <span class="rozet">Üye</span>
-      </div>
-      <div class="uye">
-        <div class="tx"><b>Selin Arı</b><span>selin@example.com</span></div>
-        <span class="rozet">Üye</span>
-      </div>
-      <div class="uye">
-        <div class="tx"><b>Can Öz</b><span>can@example.com</span></div>
-        <span class="rozet">Üye</span>
-      </div>
-      <div class="uyari">Etkinliğe katılmayan üyeler de oylayabiliyor (karar 2).</div>`
+      ${UYELER.map(u => `
+        <div class="uye">
+          <div class="tx"><b>${u.ad}</b><span>${u.mail}${u.ben?' · sen':''}</span></div>
+          ${u.rol==='bekliyor'
+            ? `<span class="rozet bekliyor">Bekliyor</span>`
+            : `<span class="rozet ${u.rol==='kurucu'?'kurucu':u.rol==='yonetici'?'yonetici':''}">${
+                 u.rol==='kurucu'?'Kurucu':u.rol==='yonetici'?'Yönetici':'Üye'}</span>`}
+        </div>
+        ${u.rol==='uye' ? `<div class="rolakt"><button data-rol="${u.ad}">Yönetici yap</button></div>` : ''}
+        ${u.rol==='yonetici' ? `<div class="rolakt"><button data-rol="${u.ad}">Yöneticilikten çıkar</button></div>` : ''}`).join('')}
+      <div class="uyari">Yöneticileri yalnız kurucu ekleyip çıkarabiliyor (karar 86).
+        Kurucu çıkarılamıyor, o yüzden kulüp hiçbir zaman yöneticisiz kalmıyor.</div>`
   },
+
 };
 
 function goster(ad){
@@ -315,6 +347,21 @@ document.getElementById('scroll').addEventListener('click', e => {
   const g = e.target.closest('[data-git]');
   if (g) return goster(g.dataset.git);
   /* Tema seçimi gerçekten çalışıyor: sayaç ve uyarı buna bağlı. */
+  /* Karar 85: elle girilen tema havuza değil, doğrudan seçime giriyor. */
+  if (e.target.closest('[data-elle]')) {
+    const inp = sc.querySelector('#elleAd');
+    const ad = (inp.value || '').trim();
+    if (ad) { HAVUZ.push({ad, neden:'', kim:'Yönetici yazdı', bekleyen:0, elle:true});
+              secili.add(ad); goster('temalar'); }
+    return;
+  }
+  const r = e.target.closest('[data-rol]');
+  if (r) {
+    const u = UYELER.find(x => x.ad === r.dataset.rol);
+    if (u) u.rol = (u.rol === 'uye') ? 'yonetici' : 'uye';
+    const y = sc.scrollTop; goster('uyeler'); sc.scrollTop = y;
+    return;
+  }
   const o = e.target.closest('[data-sec]');
   if (o) {
     const ad = o.dataset.sec;
