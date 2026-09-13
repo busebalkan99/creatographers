@@ -160,6 +160,39 @@ body{background:#050506;color:var(--ink);font-family:"Archivo",system-ui,sans-se
   background:transparent;box-shadow:inset 0 0 0 1px var(--rule);color:var(--soft);font:inherit;
   font-size:11px;font-weight:800;letter-spacing:.2em;text-transform:uppercase}
 
+/* Karar 87: kurucu devri. Kulüpteki tek geri alinamaz islem.
+   Renk YOK: karar 47 rengi asamaya ayirdi, "tehlike kirmizisi" o sistemi
+   bozar ve ekranda asama bildirmeyen bir renk olusur. Agirlik ayri bir
+   bolum, kalin ayrac ve acik metinle veriliyor. */
+.devir{margin-top:30px;border-top:4px solid var(--ink);padding-top:14px}
+.devir h3{font-size:15px;font-weight:900;text-transform:uppercase;letter-spacing:.01em;
+  font-variation-settings:"wdth" 76,"wght" 900}
+.devir p{margin-top:10px;font-size:11px;font-weight:800;letter-spacing:.04em;
+  color:var(--soft);line-height:1.6}
+.aday{border-top:1px solid var(--rule);padding:14px 0;display:flex;align-items:center;gap:12px;cursor:pointer}
+.aday .kutu{width:22px;height:22px;flex:0 0 auto;border-radius:2px;box-shadow:inset 0 0 0 2px var(--soft)}
+.aday.secili .kutu{background:var(--me);box-shadow:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23EDEDEA' stroke-width='3'%3E%3Cpath d='M5 13l4 4L19 7'/%3E%3C/svg%3E");
+  background-size:16px;background-position:center;background-repeat:no-repeat}
+.aday .tx{min-width:0;flex:1}
+.aday .tx b{display:block;font-size:12.5px;font-weight:900;text-transform:uppercase;letter-spacing:.01em}
+.aday .tx span{display:block;margin-top:4px;font-size:11px;font-weight:800;letter-spacing:.04em;
+  color:var(--soft);text-transform:none}
+.devam{margin-top:18px;height:48px;width:100%;appearance:none;border:0;cursor:pointer;border-radius:2px;
+  background:var(--ink);color:var(--paper);font:inherit;
+  font-size:11px;font-weight:800;letter-spacing:.2em;text-transform:uppercase}
+.devam:disabled{background:transparent;box-shadow:inset 0 0 0 1px var(--rule);color:var(--soft);cursor:default}
+/* Onay ekrani: ne olacagi madde madde, tahmin birakmadan. */
+.sonuc{margin-top:16px;border:1px solid var(--rule);padding:15px}
+.sonuc .st{display:flex;align-items:baseline;gap:10px;padding:9px 0}
+.sonuc .st + .st{border-top:1px solid var(--rule)}
+.sonuc .st b{font-size:12.5px;font-weight:900;text-transform:uppercase;letter-spacing:.01em}
+.sonuc .st span{margin-left:auto;flex:0 0 auto;font-size:11px;font-weight:800;letter-spacing:.2em;
+  text-transform:uppercase;color:var(--soft)}
+.sonuc .st span.yeni{background:var(--me);color:var(--ink);padding:3px 8px;border-radius:2px}
+.geridonus{margin-top:14px;border:1px dashed var(--rule);padding:12px 13px;
+  font-size:11px;font-weight:800;letter-spacing:.04em;color:var(--soft);line-height:1.55}
+
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{transition-duration:.001ms!important}}
 </style>
 </head>
@@ -172,6 +205,8 @@ body{background:#050506;color:var(--ink);font-family:"Archivo",system-ui,sans-se
   <button data-s="kur">Etkinliği kur</button>
   <button data-s="asama">Aşama kontrolü</button>
   <button data-s="uyeler">Üyeler</button>
+  <button data-s="devir">Kulübü devret</button>
+  <button data-s="onay">Devir · onay</button>
 </div>
 <p class="note" id="note"></p>
 
@@ -195,6 +230,8 @@ let secili = new Set(['Gece','Eller']);
 
 /* Karar 86: üç rol. Bu prototipte sen kurucusun, o yüzden rol değiştirme
    düğmeleri görünüyor; yönetici olsaydın görünmezdi. */
+let devralan = null;   /* devri alacak yönetici */
+
 const UYELER = [
   {ad:'Deniz Akın',  mail:'deniz.akin@example.com', rol:'bekliyor'},
   {ad:'Ayşe Kaya',   mail:'ayse@example.com',       rol:'kurucu', ben:true},
@@ -326,9 +363,59 @@ const EKRAN = {
         ${u.rol==='uye' ? `<div class="rolakt"><button data-rol="${u.ad}">Yönetici yap</button></div>` : ''}
         ${u.rol==='yonetici' ? `<div class="rolakt"><button data-rol="${u.ad}">Yöneticilikten çıkar</button></div>` : ''}`).join('')}
       <div class="uyari">Yöneticileri yalnız kurucu ekleyip çıkarabiliyor (karar 86).
-        Kurucu çıkarılamıyor, o yüzden kulüp hiçbir zaman yöneticisiz kalmıyor.</div>`
+        Kurucu çıkarılamıyor, o yüzden kulüp hiçbir zaman yöneticisiz kalmıyor.</div>
+      <div class="devir">
+        <h3>Kulübü devret</h3>
+        <p>Kurucu rolünü bir yöneticiye bırakırsın. Kulüpten ayrılmak istiyorsan
+           önce bunu yapman gerekiyor (karar 87).</p>
+        <button class="devam" data-git="devir" style="background:transparent;box-shadow:inset 0 0 0 2px var(--ink);color:var(--ink)">Devri başlat</button>
+      </div>`
   },
 
+
+  devir: {
+    not:'Karar 87: devri yalnız kurucu başlatır ve alıcı bir yönetici olmalı. Kulübü hiç o işi yapmamış birine bırakmak risk; birini önce yönetici yapmak zaten tek dokunuş.',
+    ciz: () => {
+      const adaylar = UYELER.filter(u => u.rol === 'yonetici');
+      return KUNYE + `
+      <div class="sec">Kulübü devret<span>geri alınamaz</span></div>
+      <div class="devir" style="margin-top:0;border-top:0;padding-top:0">
+        <p>Kurucu rolünü bir yöneticiye devredebilirsin. Devirden sonra sen yönetici
+           olarak kalırsın; kulüpten tamamen ayrılmak istiyorsan önce devretmen gerekiyor.</p>
+      </div>
+      <div class="sec">Kime<span>${adaylar.length} yönetici</span></div>
+      ${adaylar.length ? adaylar.map(u => `
+        <div class="aday ${devralan===u.ad?'secili':''}" data-aday="${u.ad}">
+          <span class="kutu"></span>
+          <div class="tx"><b>${u.ad}</b><span>${u.mail}</span></div>
+        </div>`).join('') : `
+        <div class="geridonus">Devredilecek yönetici yok. Önce Üyeler ekranından
+          birini yönetici yapman gerekiyor.</div>`}
+      <button class="devam" data-git="onay" ${devralan?'':'disabled'}>
+        ${devralan ? 'Devam et' : 'Önce birini seç'}</button>`;
+    }
+  },
+
+  onay: {
+    not:'İkinci adım. Ne olacağı tahmine bırakılmadan madde madde yazılıyor. Karar 87: isim yazdırarak doğrulama 20 kişilik bir kulüpte abartı, iki adım ve açık bir cümle yeterli.',
+    ciz: () => {
+      const ad = devralan || 'Mert Demir';
+      return KUNYE + `
+      <div class="sec">Onay<span>son adım</span></div>
+      <div class="devir" style="margin-top:0;border-top:0;padding-top:0">
+        <h3>Kulübü ${ad}<br>devralıyor</h3>
+        <p>Bu işlem geri alınamıyor. Devirden sonra kurucu rolünü geri almak için
+           ${ad}'in sana devretmesi gerekir.</p>
+      </div>
+      <div class="sonuc">
+        <div class="st"><b>${ad}</b><span class="yeni">Kurucu olur</span></div>
+        <div class="st"><b>Ayşe Kaya · sen</b><span>Yönetici olursun</span></div>
+      </div>
+      <div class="geridonus">Yöneticilik yetkilerin duruyor: etkinlik kurabilir, tema
+        seçebilir, aşama çevirebilirsin. Yalnız yönetici ekleyip çıkarma yetkin gider.</div>
+      <button class="devam" data-git="uyeler">Kurucuyu değiştir</button>`;
+    }
+  },
 };
 
 function goster(ad){
@@ -355,6 +442,10 @@ document.getElementById('scroll').addEventListener('click', e => {
               secili.add(ad); goster('temalar'); }
     return;
   }
+  const ad = e.target.closest('[data-aday]');
+  if (ad) { devralan = (devralan === ad.dataset.aday) ? null : ad.dataset.aday;
+            const y = sc.scrollTop; goster('devir'); sc.scrollTop = y; return; }
+
   const r = e.target.closest('[data-rol]');
   if (r) {
     const u = UYELER.find(x => x.ad === r.dataset.rol);
