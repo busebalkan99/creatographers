@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,maximum-scale=1">
+<title>Creatographers · tema önerisi</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&display=swap" rel="stylesheet">
+<style>
+/* ==========================================================
+   Parça 4 · Tema önerisi
+   Kararlar 81 (kulüp önerir, yönetici seçer) ve 82 (işleyiş).
+
+   Havuz yalnız yöneticide, yani öneri bırakmak dışarıdan boşluğa
+   konuşmaya benziyor. Telafisi: kendi önerinin durumunu görüyorsun
+   ve seçildiğinde öğreniyorsun. Karşılığı görünür kılan tek yer bu.
+
+   Yerleşim karar 62'nin kuralı: öneri bırakmak ana ekranın "arada"
+   hâlinde (boşluğun yaşandığı yer), kendi önerilerin Profil'de.
+   ========================================================== */
+:root{
+  --paper:#0A0A0B; --ink:#EDEDEA;
+  --dim:rgba(237,237,234,.58);
+  --soft:rgba(237,237,234,.49);      /* metin tabanı, 4,50:1 */
+  --faint:rgba(237,237,234,.30);     /* yalnız dekoratif */
+  --rule:rgba(237,237,234,.18);
+  --grain:.045; --pad:18px;
+  --me:#0C6E4A;                      /* safelight yeşili, kimlik/onay */
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{background:#050506;color:var(--ink);font-family:"Archivo",system-ui,sans-serif;
+  display:flex;flex-direction:column;align-items:center;gap:14px;padding:18px 0;overflow:auto}
+
+.tools{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;max-width:460px;padding:0 12px}
+.tools button{appearance:none;border:1px solid var(--rule);background:transparent;color:var(--dim);
+  font:inherit;font-size:9.5px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;
+  padding:8px 11px;cursor:pointer;border-radius:2px}
+.tools button.on{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.tools .lbl{font-size:9px;font-weight:800;letter-spacing:.18em;text-transform:uppercase;
+  color:var(--faint);align-self:center;margin-right:2px}
+.note{max-width:390px;padding:0 14px;font-size:11px;line-height:1.6;color:var(--dim)}
+
+.device{width:min(390px,100vw);height:844px;max-height:calc(100dvh - 92px);
+  position:relative;overflow:hidden;background:var(--paper);
+  border:1px solid var(--rule);display:flex;flex-direction:column;flex:0 0 auto}
+.device::after{content:'';position:absolute;inset:0;z-index:30;pointer-events:none;opacity:var(--grain);
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E")}
+.scroll{flex:1;min-height:0;overflow-y:auto;padding:0 var(--pad) 26px;scrollbar-width:none}
+.scroll::-webkit-scrollbar{display:none}
+.scroll > .mast{margin-top:16px}
+
+/* ---- ölçek, karar 79 ---- */
+.mast{display:flex;align-items:center;font-size:11px;font-weight:800;letter-spacing:.2em;
+  text-transform:uppercase;color:var(--soft)}
+.mast .r{margin-left:auto}
+.rb{height:4px;background:var(--ink);margin-top:8px}
+.sec{margin-top:28px;border-top:4px solid var(--ink);padding:12px 0;
+  font-size:13px;font-weight:900;letter-spacing:.16em;text-transform:uppercase;color:var(--ink);
+  display:flex;align-items:baseline}
+.sec span{margin-left:auto;font-size:11px;font-weight:800;letter-spacing:.04em;
+  text-transform:none;color:var(--soft);font-variant-numeric:tabular-nums}
+
+/* ---- sıradaki etkinlik şeridi (karar 44) ---- */
+.next{margin-top:18px;padding:13px 0;border-top:4px solid var(--ink);border-bottom:1px solid var(--rule);
+  display:flex;align-items:baseline;gap:10px}
+.next .k{font-size:11px;font-weight:800;letter-spacing:.2em;text-transform:uppercase;color:var(--soft)}
+.next .v{margin-left:auto;font-size:17px;letter-spacing:-.02em;
+  font-variation-settings:"wdth" 72,"wght" 900;font-variant-numeric:tabular-nums}
+.next .u{font-size:11px;font-weight:800;letter-spacing:.04em;color:var(--soft)}
+
+/* ---- öneri bloğu ---- */
+.oner{margin-top:16px;border:1px solid var(--rule);padding:16px 15px 17px}
+.oner b{display:block;font-size:11px;font-weight:800;letter-spacing:.2em;
+  text-transform:uppercase;color:var(--soft)}
+.oner h3{margin-top:9px;font-size:15px;font-weight:900;text-transform:uppercase;
+  letter-spacing:.01em;line-height:1.2;font-variation-settings:"wdth" 76,"wght" 900}
+.oner p{margin-top:9px;font-size:11px;font-weight:800;letter-spacing:.04em;
+  color:var(--soft);line-height:1.6}
+.oner .act{margin-top:14px;height:48px;display:flex;align-items:center;justify-content:center;
+  box-shadow:inset 0 0 0 2px var(--ink);border-radius:2px;cursor:pointer;
+  font-size:11px;font-weight:800;letter-spacing:.2em;text-transform:uppercase}
+
+/* ---- öneri durumu ---- */
+.durum{margin-top:16px;border:1px solid var(--rule);padding:15px}
+.durum .ust{display:flex;align-items:baseline;gap:10px}
+.durum .ad{font-size:15px;font-weight:900;text-transform:uppercase;letter-spacing:.01em;
+  font-variation-settings:"wdth" 76,"wght" 900}
+.durum .rozet{margin-left:auto;flex:0 0 auto;font-size:11px;font-weight:800;letter-spacing:.2em;
+  text-transform:uppercase;color:var(--soft)}
+.durum .rozet.secildi{background:var(--me);color:var(--ink);padding:3px 8px;border-radius:2px}
+.durum .neden{margin-top:9px;font-size:11px;font-weight:800;letter-spacing:.04em;
+  color:var(--soft);line-height:1.6}
+.durum .alt{margin-top:12px;padding-top:11px;border-top:1px solid var(--rule);
+  font-size:11px;font-weight:800;letter-spacing:.04em;color:var(--soft);line-height:1.55}
+
+/* ---- form ---- */
+.form{margin-top:18px}
+.form label{display:block;font-size:11px;font-weight:800;letter-spacing:.2em;
+  text-transform:uppercase;color:var(--soft);margin-bottom:9px}
+.form input,.form textarea{
+  width:100%;background:transparent;color:var(--ink);font:inherit;
+  font-size:15px;font-weight:900;letter-spacing:.01em;text-transform:uppercase;
+  /* Dolgu dokunma hedefi icin: 9/11 iken alan 37px kaliyordu, esik 44. */
+  border:0;border-bottom:1px solid var(--rule);padding:13px 0 15px;outline:none;
+  font-variation-settings:"wdth" 76,"wght" 900}
+.form textarea{font-size:12.5px;font-weight:800;text-transform:none;letter-spacing:.01em;
+  line-height:1.55;min-height:66px;resize:none;font-variation-settings:normal}
+.form input:focus,.form textarea:focus{border-bottom-color:var(--ink)}
+.form .ipucu{margin-top:9px;font-size:11px;font-weight:800;letter-spacing:.04em;
+  color:var(--soft);line-height:1.55}
+.form .blok{margin-top:24px}
+.form .gonder{margin-top:26px;height:48px;width:100%;appearance:none;border:0;cursor:pointer;
+  background:var(--ink);color:var(--paper);font:inherit;
+  font-size:11px;font-weight:800;letter-spacing:.2em;text-transform:uppercase;border-radius:2px}
+
+/* ---- profil: kendi önerilerin ---- */
+.satir{border-top:1px solid var(--rule);padding:14px 0;display:flex;align-items:baseline;gap:10px}
+.satir .ad{font-size:12.5px;font-weight:900;text-transform:uppercase;letter-spacing:.01em;min-width:0}
+.satir .rozet{margin-left:auto;flex:0 0 auto;font-size:11px;font-weight:800;letter-spacing:.2em;
+  text-transform:uppercase;color:var(--soft)}
+.satir .rozet.secildi{background:var(--me);color:var(--ink);padding:3px 8px;border-radius:2px}
+.satir .tarih{display:block;margin-top:5px;font-size:11px;font-weight:800;letter-spacing:.04em;
+  text-transform:none;color:var(--soft)}
+
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{transition-duration:.001ms!important}}
+</style>
+</head>
+<body>
+
+<div class="tools" id="tools">
+  <span class="lbl">Ekran</span>
+  <button data-s="bos" class="on">Arada · öneri yok</button>
+  <button data-s="form">Öneri bırak</button>
+  <button data-s="havuzda">Arada · havuzda</button>
+  <button data-s="secildi">Önerin seçildi</button>
+  <button data-s="profil">Profil · önerilerin</button>
+</div>
+<p class="note" id="note"></p>
+
+<div class="device"><div class="scroll" id="scroll"></div></div>
+
+<script>
+const KUNYE = `<div class="mast"><span>Creatographers</span><span class="r">20 üye</span></div>
+  <div class="rb"></div>`;
+
+/* Sıradaki etkinlik şeridi: karar 44'ün "arada" hâli. Öneri bloğu onun altında,
+   çünkü boşluk orada yaşanıyor. */
+const SIRADAKI = `
+  <div class="next">
+    <span class="k">Sıradaki · Ocak</span>
+    <span class="v">34</span><span class="u">gün</span>
+  </div>`;
+
+const EKRAN = {
+
+  /* 1 · Henüz öneri bırakmamışsın */
+  bos: {
+    not:'Arada hâli, henüz öneri bırakmamışsın. Öneri bloğu sıradaki etkinlik şeridinin altında, yani boşluğun yaşandığı yerde (kararlar 44 ve 82).',
+    ciz: () => KUNYE + SIRADAKI + `
+      <div class="oner">
+        <b>Tema önerisi</b>
+        <h3>Bir sonraki<br>etkinlik ne olsun</h3>
+        <p>Aklına bir tema geldiyse havuza bırak. Yönetici etkinliği kurarken
+           havuzdan seçiyor. Aynı anda bir önerin olabilir.</p>
+        <div class="act" data-git="form">Tema öner</div>
+      </div>` + ARSIV
+  },
+
+  /* 2 · Öneri bırakma */
+  form: {
+    not:'Tema adı zorunlu, gerekçe değil. Gerekçe isteğe bağlı çünkü zorunlu olsa insanlar tema önermek yerine kompozisyon yazmaya çalışır.',
+    ciz: () => KUNYE + `
+      <div class="sec">Tema öner<span>havuza gider</span></div>
+      <div class="form">
+        <label for="ad">Tema</label>
+        <input id="ad" placeholder="ÖRNEK: GECE" maxlength="24">
+        <div class="ipucu">Tek kelime ya da kısa bir tamlama. En fazla 24 karakter.</div>
+
+        <div class="blok">
+          <label for="neden">Neden, isteğe bağlı</label>
+          <textarea id="neden" placeholder="Bu temada ne görmek istediğini bir cümleyle anlat." maxlength="140"></textarea>
+          <div class="ipucu">Yönetici seçerken okuyor. Kulüp görmüyor.</div>
+        </div>
+
+        <button class="gonder" data-git="havuzda">Havuza bırak</button>
+      </div>`
+  },
+
+  /* 3 · Önerin havuzda bekliyor */
+  havuzda: {
+    not:'Öneri bırakıldıktan sonraki hâl. Havuz yalnız yöneticide olduğu için kişi kulübün ne önerdiğini görmüyor; gördüğü tek şey kendi önerisinin durumu (karar 82).',
+    ciz: () => KUNYE + SIRADAKI + `
+      <div class="durum">
+        <div class="ust">
+          <span class="ad">Gece</span>
+          <span class="rozet">Havuzda</span>
+        </div>
+        <div class="neden">Karanlıkta uzun pozlama denemek istiyorum.</div>
+        <div class="alt">Yönetici etkinliği kurarken havuzdan seçiyor.
+          Seçilmezse önerin havuzda kalıyor, sonraki etkinlikte tekrar aday.</div>
+      </div>` + ARSIV
+  },
+
+  /* 4 · Önerin seçildi */
+  secildi: {
+    not:'Karşılığın görünür olduğu tek an. Karar 35 uygulama içi bildirim altyapısı kurmuyor, o yüzden bu bir bildirim değil, kendi öneri satırının durumu.',
+    ciz: () => KUNYE + `
+      <div class="next">
+        <span class="k">Ocak etkinliği</span>
+        <span class="v">2</span><span class="u">gün</span>
+      </div>
+      <div class="durum">
+        <div class="ust">
+          <span class="ad">Gece</span>
+          <span class="rozet secildi">Seçildi</span>
+        </div>
+        <div class="neden">Karanlıkta uzun pozlama denemek istiyorum.</div>
+        <div class="alt">Ocak etkinliğinin üç temasından biri senin önerin.
+          Havuz boşaldı, yeni bir tema önerebilirsin.</div>
+      </div>` + ARSIV
+  },
+
+  /* 5 · Profil: kendi önerilerinin geçmişi */
+  profil: {
+    not:'Kendi önerilerin Profil’de, çünkü karar 62 tek kişiyi anlatan şeyi oraya koyuyor. Seçilmeyenler "elendi" demiyor, havuzda bekliyor.',
+    ciz: () => KUNYE + `
+      <div class="sec">Önerilerin<span>4 öneri</span></div>
+      <div class="satir">
+        <span class="ad">Gece<span class="tarih">Eylül 2026'da önerildi</span></span>
+        <span class="rozet secildi">Seçildi</span>
+      </div>
+      <div class="satir">
+        <span class="ad">Islak zemin<span class="tarih">Temmuz 2026'da önerildi</span></span>
+        <span class="rozet">Havuzda</span>
+      </div>
+      <div class="satir">
+        <span class="ad">Kalabalık<span class="tarih">Mayıs 2026'da önerildi</span></span>
+        <span class="rozet secildi">Seçildi</span>
+      </div>
+      <div class="satir">
+        <span class="ad">Pencere<span class="tarih">Mart 2026'da önerildi</span></span>
+        <span class="rozet">Havuzda</span>
+      </div>`
+  },
+};
+
+/* Arşiv, ana ekranın omurgası (karar 44). Burada kısaltılmış duruyor;
+   öneri bloğunun bağlam içinde göründüğünü göstermek için var. */
+const ARSIV = `
+  <div class="sec">Geçmiş etkinlikler<span>5 etkinlik</span></div>
+  <div class="satir"><span class="ad">05 · Eylül<span class="tarih">Sokak · Portre · Gece</span></span></div>
+  <div class="satir"><span class="ad">04 · Temmuz<span class="tarih">Su · Gölge</span></span></div>
+  <div class="satir"><span class="ad">03 · Mayıs<span class="tarih">Yol · Yeşil · Kalabalık</span></span></div>`;
+
+function goster(ad){
+  const sc = document.getElementById('scroll');
+  sc.innerHTML = EKRAN[ad].ciz();
+  document.getElementById('note').textContent = EKRAN[ad].not;
+  sc.scrollTop = 0;
+  document.querySelectorAll('.tools button').forEach(b => b.classList.toggle('on', b.dataset.s === ad));
+}
+document.getElementById('tools').addEventListener('click', e => {
+  const b = e.target.closest('button'); if (b) goster(b.dataset.s);
+});
+/* Ekran içindeki düğmeler de akışı sürdürüyor, prototip anahtarına gerek kalmasın. */
+document.getElementById('scroll').addEventListener('click', e => {
+  const g = e.target.closest('[data-git]'); if (g) goster(g.dataset.git);
+});
+goster('bos');
+</script>
+</body>
+</html>
