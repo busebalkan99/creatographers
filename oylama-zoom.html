@@ -216,6 +216,7 @@ body{
 .done h2{
   font-size:58px;line-height:.82;letter-spacing:-.06em;text-transform:uppercase;
   font-variation-settings:"wdth" 72,"wght" 900;
+  word-spacing:.12em;   /* -.06em harf aralığında "4 KARE" "4KARE" gibi okunuyordu */
   /* Sert 6ch sınırı kaldırıldı: "Kalabalık" gibi uzun bir tema adı kutudan taşıyordu.
      Karar 50'nin mantığı, ad kesilmez, sarar. */
   overflow-wrap:anywhere;
@@ -228,10 +229,17 @@ body{
    2 kare komşusuyla 43px örtüşüyordu. Ayrıca idx'e bağlı ölçek aynı satırdaki
    kareleri farklı boyutta yapıyordu. */
 .done .miss{
-  border-top:4px solid var(--ink);
-  padding-top:11px;margin-top:6px;
   display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;
 }
+/* Izgaranın başlığı. Önce sadece 4px çizgi vardı, ne olduğu yazmıyordu; bir arkadaş
+   "oy verilmemiş fotoğraflar olduğu belli değil" dedi. Karar 79'un seviye-1 bölüm
+   başlığı: 4px ayraç + mürekkep etiket + sağda sayı. */
+.done .missbas{border-top:4px solid var(--ink);padding-top:12px;margin-top:6px;
+  font-size:13px;font-weight:900;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--ink);display:flex;align-items:baseline}
+.done .missbas[hidden]{display:none}
+.done .missbas span{margin-left:auto;font-size:11px;font-weight:800;letter-spacing:.04em;
+  color:var(--soft);font-variant-numeric:tabular-nums}
 .miss-card{
   appearance:none;border:1px solid var(--rule);background:rgba(237,237,234,.02);
   color:var(--ink);position:relative;
@@ -365,8 +373,9 @@ SHOTS.forEach((s,i)=>{
 html += `
   <section class="done" id="done">
     <div class="rule-bold" style="margin:0 0 14px"></div>
-    <h2>Sokak<br>bitti</h2>
+    <h2 id="baslik">Sokak<br>bitti</h2>
     <p id="lede">Bu temadaki bütün kareleri gezdin.</p>
+    <div class="missbas" id="missbas" hidden>Puan vermediğin kareler<span id="missSay"></span></div>
     <div class="miss" id="miss" hidden></div>
     <button id="go">Başa dön</button>
   </section>`;
@@ -482,10 +491,18 @@ function layoutMiss(cards){
   }
 }
 
+const baslikEl=document.getElementById('baslik');
+const missBas=document.getElementById('missbas');
+const missSay=document.getElementById('missSay');
 function refresh(){
   const m=missing();
   if(m.length){
+    /* Başlık "bitti" demiyor: eksik varken tema bitmemiş. Önce "Sokak bitti" yazıp
+       hemen altında "kapanmıyor" diyordu, ikisi çelişiyordu. */
+    baslikEl.innerHTML = `${m.length} kare<br>kaldı`;
     lede.textContent='Puan vermeden tema kapanmıyor.';
+    missBas.hidden=false;
+    missSay.textContent=String(m.length);
     missEl.hidden=false;
     missEl.innerHTML = m.map(ix => {
       const shot = SHOTS[ix];
@@ -509,9 +526,11 @@ function refresh(){
         if(t) feed.scrollTo({top:t.offsetTop,behavior:'smooth'});
       });
     });
-    go.textContent = `${m[0]+1}. kareye git`;
+    go.textContent = 'İlk puansız kareye dön';
   } else {
+    baslikEl.innerHTML = 'Sokak<br>bitti';
     lede.textContent='Bütün karelere puan verdin.';
+    missBas.hidden=true;
     missEl.hidden=true;
     missEl.innerHTML='';
     go.textContent='Başa dön';
