@@ -193,13 +193,18 @@ body{background:#050506;color:var(--ink);font-family:"Archivo",system-ui,sans-se
 .geridonus{margin-top:14px;border:1px dashed var(--rule);padding:12px 13px;
   font-size:11px;font-weight:800;letter-spacing:.04em;color:var(--soft);line-height:1.55}
 
-/* Karar 88: süre seçenekleri. Mekanizma, o yüzden 2px (karar 61). */
-.ayar .deg.acik{box-shadow:inset 0 0 0 2px var(--ink);color:var(--ink)}
-.secenek{display:flex;gap:6px;padding:0 0 14px}
-.secenek button{flex:1;appearance:none;border:0;cursor:pointer;height:44px;border-radius:2px;
-  background:transparent;box-shadow:inset 0 0 0 1px var(--rule);color:var(--soft);font:inherit;
-  font-size:11px;font-weight:800;letter-spacing:.04em;font-variant-numeric:tabular-nums}
-.secenek button.on{background:var(--ink);color:var(--paper);box-shadow:none}
+/* Karar 91: süre alanı. Değer 17px, çünkü iOS 16px'ten küçük alana dokununca sayfayı
+   yakınlaştırıyor; 17px ölçekte zaten "vurgu değer" seviyesi (karar 79).
+   Kutunun tamamı dokunma alanı: label olduğu için neresine basılsa alan odaklanıyor. */
+.ayar .deg.sure{cursor:text;gap:5px;padding:0 12px;justify-content:flex-end}
+.ayar .deg.sure:focus-within{box-shadow:inset 0 0 0 2px var(--ink)}
+.ayar .deg.sure.hatali{box-shadow:inset 0 0 0 2px var(--ink)}
+.ayar .deg.sure input{width:3.2ch;min-width:0;background:transparent;border:0;outline:none;
+  color:var(--ink);font:inherit;font-size:17px;letter-spacing:-.02em;text-align:right;padding:0;
+  font-variation-settings:"wdth" 72,"wght" 900;font-variant-numeric:tabular-nums}
+.ayar .deg.sure span{font-size:11px;font-weight:800;letter-spacing:.04em;color:var(--soft)}
+.hata{margin:-4px 0 12px;font-size:11px;font-weight:800;letter-spacing:.04em;
+  color:var(--ink);line-height:1.55;border-left:3px solid var(--ink);padding-left:9px}
 
 /* Karar 90: bir kerelik rol kartı. Ters çevrilmemiş, çerçeveli; bildirim değil durum. */
 .rolkart{margin-top:18px;border:1px solid var(--ink);padding:16px 15px 17px}
@@ -254,7 +259,10 @@ let secili = new Set(['Gece','Eller']);
 let devralan = null;   /* devri alacak yönetici */
 /* Karar 88: süreler ve hangi satırın seçenekleri açık. */
 const SURE = {yukle:48, oyla:72};
-let sureAcik = null;
+/* Karar 91: süre elle giriliyor, 12-168 saat. Birkaç saatlik pencere 20 kişiye yetmez;
+   bir haftadan uzunu sonraki etkinliğe fazla yaklaşır. Geçersiz girişte eski değer kalıyor. */
+const SURE_MIN = 12, SURE_MAX = 168;
+const SURE_HATA = {yukle:false, oyla:false};
 
 const UYELER = [
   {ad:'Deniz Akın',  mail:'deniz.akin@example.com', rol:'bekliyor'},
@@ -497,14 +505,21 @@ const EKRAN = {
   },
 };
 
-/* Karar 88: seçenekler satırın hemen altında açılıyor, ayrı pencere yok. */
+/* Karar 91: değer doğrudan yazılıyor. type="number" değil, çünkü o alan e, +, -
+   ve ondalık kabul ediyor; metin alanı + inputmode="numeric" telefonda yalnız rakam
+   klavyesini açıyor, rakam olmayanlar yazarken siliniyor. */
 function sureSatiri(k, ad, alt){
   return `<div class="ayar">
       <div class="tx"><b>${ad}</b><span>${alt}</span></div>
-      <div class="deg ${sureAcik===k?'acik':''}" data-sure="${k}">${SURE[k]} sa</div>
+      <label class="deg sure ${SURE_HATA[k]?'hatali':''}">
+        <input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="3"
+               enterkeyhint="done" autocomplete="off" value="${SURE[k]}"
+               data-sure-inp="${k}" aria-label="${ad} süresi, saat">
+        <span>sa</span>
+      </label>
     </div>
-    ${sureAcik===k ? `<div class="secenek">${[24,48,72,96].map(v =>
-      `<button class="${SURE[k]===v?'on':''}" data-sec-sure="${k}:${v}">${v} sa</button>`).join('')}</div>` : ''}`;
+    ${SURE_HATA[k] ? `<div class="hata">${SURE_MIN} ile ${SURE_MAX} saat arasında bir sayı gir.
+      Önceki değer (${SURE[k]} sa) duruyor.</div>` : ''}`;
 }
 
 function goster(ad){
@@ -531,12 +546,6 @@ document.getElementById('scroll').addEventListener('click', e => {
               secili.add(ad); goster('temalar'); }
     return;
   }
-  const su = e.target.closest('[data-sure]');
-  if (su) { sureAcik = (sureAcik === su.dataset.sure) ? null : su.dataset.sure;
-            const y = sc.scrollTop; goster('kur'); sc.scrollTop = y; return; }
-  const ss = e.target.closest('[data-sec-sure]');
-  if (ss) { const [k,v] = ss.dataset.secSure.split(':'); SURE[k] = +v; sureAcik = null;
-            const y = sc.scrollTop; goster('kur'); sc.scrollTop = y; return; }
   if (e.target.closest('[data-kapat]')) {
     const k = sc.querySelector('.rolkart'); if (k) k.remove(); return;
   }
@@ -558,6 +567,27 @@ document.getElementById('scroll').addEventListener('click', e => {
     secili.has(ad) ? secili.delete(ad) : secili.add(ad);
     const y = sc.scrollTop; goster('temalar'); sc.scrollTop = y;
   }
+});
+/* Yazarken: rakam olmayan her şey siliniyor (yapıştırılan metin dahil). */
+document.getElementById('scroll').addEventListener('input', e => {
+  const i = e.target.closest('[data-sure-inp]'); if (!i) return;
+  const temiz = i.value.replace(/[^0-9]/g, '');
+  if (temiz !== i.value) i.value = temiz;
+});
+/* Enter / Bitti: klavyeyi kapat, değer değişince doğrulanıyor. */
+document.getElementById('scroll').addEventListener('keydown', e => {
+  const i = e.target.closest('[data-sure-inp]');
+  if (i && e.key === 'Enter') { e.preventDefault(); i.blur(); }
+});
+/* Alandan çıkınca doğrula. Yazarken yeniden çizmiyoruz, yoksa odak kaybolur. */
+document.getElementById('scroll').addEventListener('focusout', e => {
+  const i = e.target.closest('[data-sure-inp]'); if (!i) return;
+  const k = i.dataset.sureInp, v = parseInt(i.value, 10);
+  const gecerli = Number.isInteger(v) && v >= SURE_MIN && v <= SURE_MAX;
+  if (gecerli) SURE[k] = v;
+  SURE_HATA[k] = !gecerli;
+  const sc = document.getElementById('scroll');
+  const y = sc.scrollTop; goster('kur'); sc.scrollTop = y;
 });
 goster('giris');
 </script>
