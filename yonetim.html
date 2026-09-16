@@ -282,7 +282,7 @@ const EKRAN = {
         <span class="lab">Rolün</span>
         <h3>Kulüp kurucusu</h3>
         <p class="veri">Etkinliği ve tarihleri sen kuruyorsun, temaları havuzdan seçiyorsun,
-           aşamaları elle çevirebiliyorsun. Yöneticileri de yalnız sen ekliyorsun (karar 86).</p>
+           aşamaları elle çevirebiliyorsun. Yöneticileri de yalnız sen ekliyorsun.</p>
         <div class="act" data-git="temalar">Yönetim</div>
       </div>
       <div class="sec">Bekleyen<span>2 iş</span></div>
@@ -311,7 +311,7 @@ const EKRAN = {
             <div class="kim">${o.elle ? 'Yönetici yazdı · havuzdan değil' : o.kim + (o.bekleyen ? ` · ${o.bekleyen} etkinliktir havuzda` : ' · yeni')}</div>
           </div>
         </div>`).join('')}
-      <div class="sec">Havuzda yoksa<span>karar 85</span></div>
+      <div class="sec">Havuzda yoksa</div>
       <div class="elle">
         <label class="lab" for="elleAd">Temayı kendin yaz</label>
         <input id="elleAd" placeholder="ÖRNEK: KIŞ BULUŞMASI" maxlength="24">
@@ -322,7 +322,7 @@ const EKRAN = {
       <div class="sayac">
         <b>Seçilen</b><span class="v">${secili.size} / 3</span>
       </div>
-      ${secili.size > 3 ? `<div class="uyari">Bir etkinlik en fazla 3 tema alıyor (karar 72). Seçimini azalt.</div>` : ''}
+      ${secili.size > 3 ? `<div class="uyari">Bir etkinlik en fazla 3 tema alıyor. Seçimini azalt.</div>` : ''}
       ${secili.size === 0 ? `<div class="uyari">Etkinliği kurmak için en az bir tema seç.</div>` : ''}`
   },
 
@@ -330,10 +330,10 @@ const EKRAN = {
     not:'Kararlar 26, 29, 32 ve 33 burada birleşiyor. Süreler varsayılanıyla geliyor, yönetici değiştirebiliyor. Çekim şartı tema başına, çünkü karar 29 "karma" diyor.',
     ciz: () => KUNYE + `
       <div class="sec">Ocak etkinliği<span>06</span></div>
-      ${sureSatiri('yukle','Yükleme','Varsayılan 48 saat (karar 32)')}
+      ${sureSatiri('yukle','Yükleme','Varsayılan 48 saat')}
       ${sureSatiri('oyla','Oylama','Yüklemeden uzun, her kareye puan gerekiyor')}
       ${SURE.oyla < SURE.yukle ? `<div class="uyari">Oylama yüklemeden kısa. Her temadaki her kareye
-        puan vermek gerekiyor (karar 33), süre yetmeyebilir. Bilerek seçtiysen sorun yok.</div>` : ''}
+        puan vermek gerekiyor, süre yetmeyebilir. Bilerek seçtiysen sorun yok.</div>` : ''}
 
       <div class="sec">Çekim şartı<span>tema başına</span></div>
       <div class="ayar">
@@ -372,11 +372,11 @@ const EKRAN = {
            kadar yükleyin, sonra oylama açılıyor.</p>
         <div class="kopya">Kopyala</div>
       </div>
-      <div class="uyari">Mesaj otomatik gitmiyor, uygulama içi bildirim yok (karar 35).
+      <div class="uyari">Mesaj otomatik gitmiyor, uygulama içi bildirim yok.
         Kopyalayıp gruba sen yapıştırıyorsun.</div>
       <div class="devir">
         <h3>Etkinliği iptal et</h3>
-        <p>Oylama açılana kadar mümkün. Oylama açıldıktan sonra yalnız süreyi uzatabilirsin (karar 89).</p>
+        <p>Oylama açılana kadar mümkün. Oylama açıldıktan sonra yalnız süreyi uzatabilirsin.</p>
         <button class="devam" data-git="iptal" style="background:transparent;box-shadow:inset 0 0 0 2px var(--ink);color:var(--ink)">İptali başlat</button>
       </div>`
   },
@@ -449,12 +449,12 @@ const EKRAN = {
         </div>
         ${u.rol==='uye' ? `<div class="rolakt"><button data-rol="${u.ad}">Yönetici yap</button></div>` : ''}
         ${u.rol==='yonetici' ? `<div class="rolakt"><button data-rol="${u.ad}">Yöneticilikten çıkar</button></div>` : ''}`).join('')}
-      <div class="uyari">Yöneticileri yalnız kurucu ekleyip çıkarabiliyor (karar 86).
+      <div class="uyari">Yöneticileri yalnız kurucu ekleyip çıkarabiliyor.
         Kurucu çıkarılamıyor, o yüzden kulüp hiçbir zaman yöneticisiz kalmıyor.</div>
       <div class="devir">
         <h3>Kulübü devret</h3>
         <p>Kurucu rolünü bir yöneticiye bırakırsın. Kulüpten ayrılmak istiyorsan
-           önce bunu yapman gerekiyor (karar 87).</p>
+           önce bunu yapman gerekiyor.</p>
         <button class="devam" data-git="devir" style="background:transparent;box-shadow:inset 0 0 0 2px var(--ink);color:var(--ink)">Devri başlat</button>
       </div>`
   },
