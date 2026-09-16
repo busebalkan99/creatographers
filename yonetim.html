@@ -193,6 +193,24 @@ body{background:#050506;color:var(--ink);font-family:"Archivo",system-ui,sans-se
 .geridonus{margin-top:14px;border:1px dashed var(--rule);padding:12px 13px;
   font-size:11px;font-weight:800;letter-spacing:.04em;color:var(--soft);line-height:1.55}
 
+/* Karar 88: süre seçenekleri. Mekanizma, o yüzden 2px (karar 61). */
+.ayar .deg.acik{box-shadow:inset 0 0 0 2px var(--ink);color:var(--ink)}
+.secenek{display:flex;gap:6px;padding:0 0 14px}
+.secenek button{flex:1;appearance:none;border:0;cursor:pointer;height:44px;border-radius:2px;
+  background:transparent;box-shadow:inset 0 0 0 1px var(--rule);color:var(--soft);font:inherit;
+  font-size:11px;font-weight:800;letter-spacing:.04em;font-variant-numeric:tabular-nums}
+.secenek button.on{background:var(--ink);color:var(--paper);box-shadow:none}
+
+/* Karar 90: bir kerelik rol kartı. Ters çevrilmemiş, çerçeveli; bildirim değil durum. */
+.rolkart{margin-top:18px;border:1px solid var(--ink);padding:16px 15px 17px}
+.rolkart h3{margin-top:9px;font-size:15px;font-weight:900;text-transform:uppercase;
+  letter-spacing:.01em;line-height:1.2;font-variation-settings:"wdth" 76,"wght" 900}
+.rolkart p{margin-top:9px}
+.rolkart .devam{margin-top:14px}
+.rolkart .kapat{margin-top:8px;height:44px;width:100%;appearance:none;border:0;cursor:pointer;
+  background:transparent;color:var(--soft);font:inherit;border-radius:2px;
+  font-size:11px;font-weight:800;letter-spacing:.2em;text-transform:uppercase}
+
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{transition-duration:.001ms!important}}
 </style>
 </head>
@@ -207,6 +225,9 @@ body{background:#050506;color:var(--ink);font-family:"Archivo",system-ui,sans-se
   <button data-s="uyeler">Üyeler</button>
   <button data-s="devir">Kulübü devret</button>
   <button data-s="onay">Devir · onay</button>
+  <button data-s="iptal">Etkinliği iptal et</button>
+  <button data-s="rolYeni">Rol · yönetici oldun</button>
+  <button data-s="rolKalkti">Rol · yetkin kalktı</button>
 </div>
 <p class="note" id="note"></p>
 
@@ -231,6 +252,9 @@ let secili = new Set(['Gece','Eller']);
 /* Karar 86: üç rol. Bu prototipte sen kurucusun, o yüzden rol değiştirme
    düğmeleri görünüyor; yönetici olsaydın görünmezdi. */
 let devralan = null;   /* devri alacak yönetici */
+/* Karar 88: süreler ve hangi satırın seçenekleri açık. */
+const SURE = {yukle:48, oyla:72};
+let sureAcik = null;
 
 const UYELER = [
   {ad:'Deniz Akın',  mail:'deniz.akin@example.com', rol:'bekliyor'},
@@ -298,14 +322,10 @@ const EKRAN = {
     not:'Kararlar 26, 29, 32 ve 33 burada birleşiyor. Süreler varsayılanıyla geliyor, yönetici değiştirebiliyor. Çekim şartı tema başına, çünkü karar 29 "karma" diyor.',
     ciz: () => KUNYE + `
       <div class="sec">Ocak etkinliği<span>06</span></div>
-      <div class="ayar">
-        <div class="tx"><b>Yükleme</b><span>Varsayılan 48 saat (karar 32)</span></div>
-        <div class="deg">48 sa</div>
-      </div>
-      <div class="ayar">
-        <div class="tx"><b>Oylama</b><span>Yüklemeden uzun, her kareye puan gerekiyor</span></div>
-        <div class="deg">72 sa</div>
-      </div>
+      ${sureSatiri('yukle','Yükleme','Varsayılan 48 saat (karar 32)')}
+      ${sureSatiri('oyla','Oylama','Yüklemeden uzun, her kareye puan gerekiyor')}
+      ${SURE.oyla < SURE.yukle ? `<div class="uyari">Oylama yüklemeden kısa. Her temadaki her kareye
+        puan vermek gerekiyor (karar 33), süre yetmeyebilir. Bilerek seçtiysen sorun yok.</div>` : ''}
 
       <div class="sec">Çekim şartı<span>tema başına</span></div>
       <div class="ayar">
@@ -345,7 +365,66 @@ const EKRAN = {
         <div class="kopya">Kopyala</div>
       </div>
       <div class="uyari">Mesaj otomatik gitmiyor, uygulama içi bildirim yok (karar 35).
-        Kopyalayıp gruba sen yapıştırıyorsun.</div>`
+        Kopyalayıp gruba sen yapıştırıyorsun.</div>
+      <div class="devir">
+        <h3>Etkinliği iptal et</h3>
+        <p>Oylama açılana kadar mümkün. Oylama açıldıktan sonra yalnız süreyi uzatabilirsin (karar 89).</p>
+        <button class="devam" data-git="iptal" style="background:transparent;box-shadow:inset 0 0 0 2px var(--ink);color:var(--ink)">İptali başlat</button>
+      </div>`
+  },
+
+  /* Karar 89: iptal oylama açılana kadar. Bu ekran yükleme açıkken. */
+  iptal: {
+    not:'Karar 89: yükleme açıkken iptal, yüklenen kareleri siler ve kaç kare olduğunu açıkça yazar. Temalar havuza döner. Oylama açıldıktan sonra bu ekrana hiç gelinmez.',
+    ciz: () => KUNYE + `
+      <div class="sec">İptal<span>geri alınamaz</span></div>
+      <div class="devir" style="margin-top:0;border-top:0;padding-top:0">
+        <h3>Ocak etkinliği<br>iptal ediliyor</h3>
+        <p>Yükleme açık. İptal edersen şimdiye kadar yüklenen kareler silinir.</p>
+      </div>
+      <div class="sonuc">
+        <div class="st"><b>Yüklenen kareler</b><span>7 kare silinir</span></div>
+        <div class="st"><b>Gece · Eller</b><span class="yeni">Havuza döner</span></div>
+      </div>
+      <div class="mesaj">
+        <b>Gruba yazılacak</b>
+        <p>Ocak etkinliği iptal edildi. Yüklediğiniz kareler silindi, temalar bir sonraki
+           etkinlik için havuzda bekliyor.</p>
+        <div class="kopya">Kopyala</div>
+      </div>
+      <button class="devam" data-git="giris">Etkinliği iptal et</button>`
+  },
+
+  /* Karar 90: rol değişince bir kerelik kart. Bu iki ekran ÜYENİN gözünden. */
+  rolYeni: {
+    not:'Karar 90: uygulama içi bildirim yok (karar 35), o yüzden kişi bir sonraki açılışta Profil’de bir kerelik kart görüyor. Kartı kimin verdiği yazıyor.',
+    ciz: () => `<div class="mast"><span>Creatographers</span><span class="r">Profil</span></div>
+      <div class="rb"></div>
+      <div class="rolkart">
+        <span class="lab">Rolün değişti</span>
+        <h3>Artık yöneticisin</h3>
+        <p class="veri">Ayşe Kaya seni yönetici yaptı. Etkinlik kurabilir, havuzdan tema seçebilir,
+           aşamaları çevirebilir ve üye onaylayabilirsin. Yönetici ekleyip çıkarmak kurucuda kalıyor.</p>
+        <button class="devam" data-git="giris">Yönetime git</button>
+        <button class="kapat" data-kapat>Tamam</button>
+      </div>
+      <div class="sec">Profilin<span>Selin Arı</span></div>
+      <div class="ayar"><div class="tx"><b>Rol</b><span>Yönetici</span></div></div>`
+  },
+
+  rolKalkti: {
+    not:'Karar 90: yetkisi kaldırılan da kartı görüyor, çünkü yönetim araçları bir anda kaybolur. Kimin kaldırdığı yazmıyor; zaten yalnız kurucu kaldırabiliyor (karar 86).',
+    ciz: () => `<div class="mast"><span>Creatographers</span><span class="r">Profil</span></div>
+      <div class="rb"></div>
+      <div class="rolkart">
+        <span class="lab">Rolün değişti</span>
+        <h3>Yönetim yetkin<br>kaldırıldı</h3>
+        <p class="veri">Üye olarak devam ediyorsun. Kare yüklemek, oylamak ve tema önermek
+           aynen duruyor.</p>
+        <button class="kapat" data-kapat>Tamam</button>
+      </div>
+      <div class="sec">Profilin<span>Selin Arı</span></div>
+      <div class="ayar"><div class="tx"><b>Rol</b><span>Üye</span></div></div>`
   },
 
   uyeler: {
@@ -418,6 +497,16 @@ const EKRAN = {
   },
 };
 
+/* Karar 88: seçenekler satırın hemen altında açılıyor, ayrı pencere yok. */
+function sureSatiri(k, ad, alt){
+  return `<div class="ayar">
+      <div class="tx"><b>${ad}</b><span>${alt}</span></div>
+      <div class="deg ${sureAcik===k?'acik':''}" data-sure="${k}">${SURE[k]} sa</div>
+    </div>
+    ${sureAcik===k ? `<div class="secenek">${[24,48,72,96].map(v =>
+      `<button class="${SURE[k]===v?'on':''}" data-sec-sure="${k}:${v}">${v} sa</button>`).join('')}</div>` : ''}`;
+}
+
 function goster(ad){
   const sc = document.getElementById('scroll');
   sc.innerHTML = EKRAN[ad].ciz();
@@ -442,6 +531,16 @@ document.getElementById('scroll').addEventListener('click', e => {
               secili.add(ad); goster('temalar'); }
     return;
   }
+  const su = e.target.closest('[data-sure]');
+  if (su) { sureAcik = (sureAcik === su.dataset.sure) ? null : su.dataset.sure;
+            const y = sc.scrollTop; goster('kur'); sc.scrollTop = y; return; }
+  const ss = e.target.closest('[data-sec-sure]');
+  if (ss) { const [k,v] = ss.dataset.secSure.split(':'); SURE[k] = +v; sureAcik = null;
+            const y = sc.scrollTop; goster('kur'); sc.scrollTop = y; return; }
+  if (e.target.closest('[data-kapat]')) {
+    const k = sc.querySelector('.rolkart'); if (k) k.remove(); return;
+  }
+
   const ad = e.target.closest('[data-aday]');
   if (ad) { devralan = (devralan === ad.dataset.aday) ? null : ad.dataset.aday;
             const y = sc.scrollTop; goster('devir'); sc.scrollTop = y; return; }
