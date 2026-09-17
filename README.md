@@ -10,6 +10,7 @@ Hepsi tarayıcıda çalışıyor, gerçek uygulama henüz yok. 390x844 telefon i
 | Sayfa | Ne |
 |---|---|
 | `index.html` | Kapak, bütün prototiplerin listesi |
+| `giris.html` | Giriş: Google ile gir, katılma isteği, onay ve ret |
 | `ana-ekran.html` | Etkinlikler arşivi, üç aşama yan yana |
 | `etkinlik.html` | Bitmiş bir etkinliğin sonucu: ödüller, tema sekmeleri, galeri, fotoğraf detayı |
 | `kare-yukleme.html` | Kare yükleme: kontakt baskı, çekim tarihi kontrolü, değiştir ve kaldır |
@@ -18,7 +19,7 @@ Hepsi tarayıcıda çalışıyor, gerçek uygulama henüz yok. 390x844 telefon i
 | `profil-siralama.html` | Sezon sıralaması ve kişi profili, dört senaryo |
 | `tahmin.html` | Tahmin oyunu, beş ekran |
 | `tema-onerisi.html` | Tema önerisi, beş ekran |
-| `yonetim.html` | Yönetim: tema seçimi, etkinlik kurma, roller |
+| `yonetim.html` | Yönetim: tema seçimi, etkinlik kurma, katılma istekleri, roller |
 | `temalar.html` | Görsel yön seçilirken denenen 22 tema |
 | `arsiv-oylama-v8.html` | Provoke öncesi oylama, karşılaştırma için |
 

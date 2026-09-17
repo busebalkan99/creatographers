@@ -58,6 +58,8 @@ body{background:#050506;color:var(--ink);font-family:"Archivo",system-ui,sans-se
   text-transform:uppercase;color:var(--soft)}
 .mast .r{margin-left:auto}
 .rb{height:4px;background:var(--ink);margin-top:8px}
+/* künye çizgisinin hemen altındaki bölüm ikinci kalın çizgiyi çizmesin, çift hat gibi duruyordu */
+.rb + .sec{border-top:0;padding-top:0;margin-top:16px}
 .sec{margin-top:26px;border-top:4px solid var(--ink);padding:12px 0;
   font-size:13px;font-weight:900;letter-spacing:.16em;text-transform:uppercase;color:var(--ink);
   display:flex;align-items:baseline}
@@ -142,6 +144,27 @@ body{background:#050506;color:var(--ink);font-family:"Archivo",system-ui,sans-se
   font-size:11px;font-weight:800;letter-spacing:.2em;text-transform:uppercase}
 
 /* ---- üye satırı ---- */
+/* ---- katılma isteği kartı (karar 95), giriş prototipiyle aynı ---- */
+.ic{width:16px;height:16px;flex:0 0 auto;stroke:currentColor;fill:none;stroke-width:2}
+.ic *{stroke-linecap:butt;stroke-linejoin:miter}
+.ic .nokta{stroke-linecap:square}
+.istek{border-top:1px solid var(--rule);padding:13px 0}
+.istek .ust{display:flex;align-items:baseline;gap:10px}
+.istek .ust b{font-size:12.5px;font-weight:900;text-transform:uppercase;letter-spacing:.01em;min-width:0;overflow-wrap:anywhere}
+.istek .ust .rozet{margin-left:auto;flex:0 0 auto;font-size:11px;font-weight:800;letter-spacing:.2em;text-transform:uppercase}
+.istek .rozet.bekliyor{background:var(--yukle);color:var(--ink);padding:3px 8px;border-radius:2px}
+.istek .mail{font-size:11px;font-weight:800;letter-spacing:.04em;color:var(--soft);margin-top:4px;overflow-wrap:anywhere}
+.istek .tekrar{margin-top:7px;display:flex;gap:6px;font-size:11px;font-weight:800;letter-spacing:.04em;line-height:1.5}
+.istek .tekrar .ic{width:15px;height:15px;margin-top:1px}
+.istek .not{margin-top:9px;font-size:12px;line-height:1.5;color:var(--dim);border-left:2px solid var(--rule);padding-left:9px}
+.istek .not.yok{color:var(--soft);font-style:italic}
+.istek .akt{display:flex;gap:6px;margin-top:10px}
+.istek .akt button{flex:1;min-height:44px;appearance:none;border:0;border-radius:2px;cursor:pointer;font:inherit;
+  font-size:11px;font-weight:800;letter-spacing:.2em;text-transform:uppercase;
+  display:flex;align-items:center;justify-content:center;gap:8px}
+.istek .akt .onay{background:var(--ink);color:var(--paper)}
+.istek .akt .ret{background:none;color:var(--ink);box-shadow:inset 0 0 0 1px var(--rule)}
+.istek .karar{margin-top:10px;display:flex;gap:8px;font-size:11px;font-weight:800;letter-spacing:.04em;color:var(--soft);line-height:1.5}
 .uye{border-top:1px solid var(--rule);padding:13px 0;display:flex;align-items:center;gap:11px}
 .uye .tx{min-width:0;flex:1}
 .uye .tx b{display:block;font-size:12.5px;font-weight:900;text-transform:uppercase;letter-spacing:.01em}
@@ -149,7 +172,6 @@ body{background:#050506;color:var(--ink);font-family:"Archivo",system-ui,sans-se
   color:var(--soft);text-transform:none}
 .uye .rozet{flex:0 0 auto;font-size:11px;font-weight:800;letter-spacing:.2em;
   text-transform:uppercase;color:var(--soft)}
-.uye .rozet.bekliyor{background:var(--yukle);color:var(--ink);padding:3px 8px;border-radius:2px}
 
 /* Karar 86: kurucu safelight yeşili (kimlik işareti, karar 59 ile aynı dil),
    yönetici çerçeveli, üye sade. Üç rol üç farklı ağırlıkta duruyor. */
@@ -264,8 +286,20 @@ const SURE = {yukle:48, oyla:72};
 const SURE_MIN = 12, SURE_MAX = 168;
 const SURE_HATA = {yukle:false, oyla:false};
 
+/* Karar 95: katılma istekleri üye listesinde değil, kendi bölümünde. Önce bekleyen kişi
+   üye satırında sadece "Bekliyor" etiketiyle duruyordu; adı, notu, onay ve ret yoktu. */
+const IKON = {
+  info: '<path d="M12,12 L12,15"/><line class="nokta" x1="12" y1="9" x2="12" y2="9"/><circle cx="12" cy="12" r="10"/>',
+  tik:  '<polyline points="4 13 9 18 20 7"/>',
+  kapat:'<path d="M6 6L18 18M18 6L6 18"/>',
+};
+const ic = n => `<svg class="ic" viewBox="0 0 24 24" aria-hidden="true">${IKON[n]}</svg>`;
+const ISTEKLER = [
+  {ad:'Deniz Akın',    mail:'deniz.akin@example.com', not:'Ayşe Kaya beni çağırdı', durum:'bekliyor'},
+  {ad:'Kaan Demirtaş', mail:'kaan.dmr@example.com',   not:'', durum:'bekliyor', onceki:1},
+];
+const bekleyenIstek = () => ISTEKLER.filter(i => i.durum === 'bekliyor').length;
 const UYELER = [
-  {ad:'Deniz Akın',  mail:'deniz.akin@example.com', rol:'bekliyor'},
   {ad:'Ayşe Kaya',   mail:'ayse@example.com',       rol:'kurucu', ben:true},
   {ad:'Mert Demir',  mail:'mert@example.com',       rol:'yonetici'},
   {ad:'Selin Arı',   mail:'selin@example.com',      rol:'uye'},
@@ -285,17 +319,17 @@ const EKRAN = {
            aşamaları elle çevirebiliyorsun. Yöneticileri de yalnız sen ekliyorsun.</p>
         <div class="act" data-git="temalar">Yönetim</div>
       </div>
-      <div class="sec">Bekleyen<span>2 iş</span></div>
+      <div class="sec">Bekleyen<span>${1 + (bekleyenIstek() ? 1 : 0)} iş</span></div>
       <div class="ayar" data-git="temalar">
         <div class="tx"><b>Havuzda 6 öneri var</b>
           <span>Ocak etkinliği için tema seçilmedi</span></div>
         <div class="deg">Aç</div>
       </div>
-      <div class="ayar" data-git="uyeler">
-        <div class="tx"><b>1 üye onay bekliyor</b>
-          <span>Davetli listeye eklenmeyi bekliyor</span></div>
+      ${bekleyenIstek() ? `<div class="ayar" data-git="uyeler">
+        <div class="tx"><b>${bekleyenIstek()} katılma isteği</b>
+          <span>Onaylaman ya da reddetmen bekleniyor</span></div>
         <div class="deg">Aç</div>
-      </div>`
+      </div>` : ''}`
   },
 
   temalar: {
@@ -436,16 +470,28 @@ const EKRAN = {
   },
 
   uyeler: {
-    not:'Karar 86: üç rol var. Kurucu yöneticileri ekler ve çıkarır, yönetici ekleyemez. Karar 2 (davetli liste) yöneticide kalıyor, kurucuya özel değil. Bu ekran kurucunun gözünden.',
+    not:'Karar 86: üç rol var. Kurucu yöneticileri ekler ve çıkarır, yönetici ekleyemez. Karar 95: listede olmayan kişi istek bırakıyor, yönetici onaylıyor ya da reddediyor; reddedilen tekrar isteyebiliyor, kartta kaçıncı kez olduğu yazıyor. Bu ekran kurucunun gözünden.',
     ciz: () => KUNYE + `
-      <div class="sec">Üyeler<span>20 üye</span></div>
+      <div class="sec">Katılma istekleri<span>${bekleyenIstek()} bekliyor</span></div>
+      ${ISTEKLER.length ? ISTEKLER.map((r,i) => `
+        <div class="istek">
+          <div class="ust"><b>${r.ad}</b>${r.durum==='bekliyor' ? '<span class="rozet bekliyor">Bekliyor</span>' : ''}</div>
+          <div class="mail">${r.mail}</div>
+          ${r.onceki ? `<div class="tekrar">${ic('info')}<span>Daha önce ${r.onceki} kez reddedildi</span></div>` : ''}
+          <div class="not ${r.not ? '' : 'yok'}">${r.not || 'Not bırakmamış'}</div>
+          ${r.durum==='bekliyor'
+            ? `<div class="akt"><button class="ret" data-red="${i}">${ic('kapat')}Reddet</button>
+               <button class="onay" data-onay="${i}">${ic('tik')}Onayla</button></div>`
+            : `<div class="karar">${ic(r.durum==='onay' ? 'tik' : 'kapat')}<span>${
+                r.durum==='onay' ? 'Onaylandı. Uygulamayı açınca içeri girecek.' : 'Reddedildi. Kişi bunu görecek, isterse tekrar isteyebilir.'}</span></div>`}
+        </div>`).join('') : '<p class="veri">Bekleyen istek yok.</p>'}
+
+      <div class="sec">Üyeler<span>${16 + UYELER.length} üye</span></div>
       ${UYELER.map(u => `
         <div class="uye">
           <div class="tx"><b>${u.ad}</b><span>${u.mail}${u.ben?' · sen':''}</span></div>
-          ${u.rol==='bekliyor'
-            ? `<span class="rozet bekliyor">Bekliyor</span>`
-            : `<span class="rozet ${u.rol==='kurucu'?'kurucu':u.rol==='yonetici'?'yonetici':''}">${
-                 u.rol==='kurucu'?'Kurucu':u.rol==='yonetici'?'Yönetici':'Üye'}</span>`}
+          <span class="rozet ${u.rol==='kurucu'?'kurucu':u.rol==='yonetici'?'yonetici':''}">${
+             u.rol==='kurucu'?'Kurucu':u.rol==='yonetici'?'Yönetici':'Üye'}</span>
         </div>
         ${u.rol==='uye' ? `<div class="rolakt"><button data-rol="${u.ad}">Yönetici yap</button></div>` : ''}
         ${u.rol==='yonetici' ? `<div class="rolakt"><button data-rol="${u.ad}">Yöneticilikten çıkar</button></div>` : ''}`).join('')}
@@ -553,6 +599,14 @@ document.getElementById('scroll').addEventListener('click', e => {
   const ad = e.target.closest('[data-aday]');
   if (ad) { devralan = (devralan === ad.dataset.aday) ? null : ad.dataset.aday;
             const y = sc.scrollTop; goster('devir'); sc.scrollTop = y; return; }
+
+  const on = e.target.closest('[data-onay]');
+  if (on) { const q = ISTEKLER[+on.dataset.onay]; q.durum = 'onay';
+            UYELER.push({ad:q.ad, mail:q.mail, rol:'uye'});
+            const y = sc.scrollTop; goster('uyeler'); sc.scrollTop = y; return; }
+  const rd = e.target.closest('[data-red]');
+  if (rd) { ISTEKLER[+rd.dataset.red].durum = 'red';
+            const y = sc.scrollTop; goster('uyeler'); sc.scrollTop = y; return; }
 
   const r = e.target.closest('[data-rol]');
   if (r) {

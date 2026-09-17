@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,maximum-scale=1">
+<title>Creatographers · giriş</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&display=swap" rel="stylesheet">
+<style>
+/* ==========================================================
+   Giriş (eksik ekranlardan ikincisi)
+   Kulübe Google hesabıyla giriliyor (karar 2). Listede olmayan biri istek bırakır,
+   yönetici onaylar ya da reddeder. İstekte ad ve isteğe bağlı kısa not var.
+   Reddedilen kişi bunu görür.
+   Giriş hiçbir aşamaya ait değil: renk yok, ışıklar açık (karar 47).
+   ========================================================== */
+:root{
+  --paper:#0A0A0B;
+  --ink:#EDEDEA;
+  --dim:rgba(237,237,234,.58);
+  --soft:rgba(237,237,234,.49);   /* metin tabanı, zeminden 4,50:1 */
+  --faint:rgba(237,237,234,.30);  /* yalnız dekoratif */
+  --rule:rgba(237,237,234,.18);
+  --grain:.045;
+  --pad:16px;
+  --yukle:#B52D12;                /* "bekliyor" etiketi, yönetim ekranıyla aynı */
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{background:#050506;color:var(--ink);font-family:"Archivo",system-ui,sans-serif;
+  display:flex;flex-direction:column;align-items:center;gap:12px;padding:16px 0;overflow:auto}
+
+.tools{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;max-width:460px;padding:0 12px}
+.tools .lbl{width:100%;text-align:center;font-size:9px;font-weight:800;letter-spacing:.18em;
+  text-transform:uppercase;color:var(--soft)}
+.tools button{appearance:none;border:1px solid var(--rule);background:transparent;color:var(--dim);
+  font:inherit;font-size:9.5px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;
+  padding:9px 10px;cursor:pointer;border-radius:2px}
+.tools button.on{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+
+.device{width:min(390px,100vw);height:844px;max-height:calc(100dvh - 110px);
+  position:relative;overflow:hidden;background:var(--paper);border:1px solid var(--rule);
+  display:flex;flex-direction:column;flex:0 0 auto}
+.device::after{content:'';position:absolute;inset:0;z-index:30;pointer-events:none;opacity:var(--grain);
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E")}
+.sc{flex:1;min-height:0;overflow-y:auto;padding:14px var(--pad) 18px;scrollbar-width:none;
+  display:flex;flex-direction:column}
+.sc::-webkit-scrollbar{display:none}
+.bosluk{flex:1}
+
+/* işaretler (karar 75) */
+.ic{width:16px;height:16px;flex:0 0 auto;stroke:currentColor;fill:none;stroke-width:2}
+.ic *{stroke-linecap:butt;stroke-linejoin:miter}
+.ic .nokta{stroke-linecap:square}
+
+.mast{display:flex;align-items:center;font-size:11px;font-weight:800;letter-spacing:.2em;
+  text-transform:uppercase;color:var(--soft)}
+.mast .r{margin-left:auto}
+.rb{height:4px;background:var(--ink);margin-top:8px}
+/* word-spacing: -.045em harf aralığında "HENÜZ YOKSUN" tek kelime gibi okunuyordu. */
+h2.t{font-size:34px;line-height:.86;letter-spacing:-.045em;word-spacing:.14em;text-transform:uppercase;margin-top:14px;
+  font-variation-settings:"wdth" 70,"wght" 900;overflow-wrap:anywhere}
+.lede{font-size:13px;color:var(--dim);line-height:1.6;margin-top:10px;max-width:34ch}
+.lab{font-size:11px;font-weight:800;letter-spacing:.2em;text-transform:uppercase;color:var(--soft)}
+/* Künye çizgisinin hemen altındaki bölümde ikinci kalın hat olmasın: iki kalın çizgi
+   18px arayla çift hat gibi duruyordu. Başlığın altında da pay var, ilk satırın
+   çizgisi yazıya yapışmasın. */
+.rb + .sec{border-top:0;padding-top:0;margin-top:16px}
+.sec{margin-top:24px;border-top:4px solid var(--ink);padding-top:11px;padding-bottom:10px;
+  font-size:13px;font-weight:900;letter-spacing:.16em;text-transform:uppercase;display:flex;align-items:baseline}
+.sec span{margin-left:auto;font-size:11px;font-weight:800;letter-spacing:.04em;text-transform:none;color:var(--soft)}
+
+/* karşılama: Provoke tam taşma, kare kenardan kenara */
+.kapak{margin:0 calc(var(--pad) * -1);position:relative}
+.kapak img{width:100%;height:360px;object-fit:cover;display:block;filter:grayscale(1) contrast(1.15)}
+.marka{font-size:44px;line-height:.82;letter-spacing:-.05em;text-transform:uppercase;margin-top:18px;
+  font-variation-settings:"wdth" 64,"wght" 900}
+.alt-bilgi{margin-top:12px;font-size:11px;font-weight:800;letter-spacing:.04em;color:var(--soft);line-height:1.6}
+
+.btn{appearance:none;border:0;background:var(--ink);color:var(--paper);border-radius:2px;cursor:pointer;
+  font:inherit;font-size:11px;font-weight:800;letter-spacing:.2em;text-transform:uppercase;min-height:52px;
+  display:flex;align-items:center;justify-content:center;gap:8px;width:100%;margin-top:16px}
+.btn:disabled{background:transparent;box-shadow:inset 0 0 0 1px var(--rule);color:var(--soft);cursor:default}
+.btn.ik{background:none;color:var(--ink);box-shadow:inset 0 0 0 1px var(--rule);margin-top:8px;min-height:48px}
+.link{appearance:none;border:0;background:none;color:var(--soft);font:inherit;cursor:pointer;
+  font-size:11px;font-weight:800;letter-spacing:.2em;text-transform:uppercase;min-height:48px;width:100%;margin-top:6px}
+
+/* hesap satırı */
+.hesap{margin-top:16px;border-top:1px solid var(--rule);border-bottom:1px solid var(--rule);padding:12px 0}
+.hesap b{display:block;font-size:12.5px;font-weight:900;letter-spacing:.01em;text-transform:none;margin-top:5px;
+  overflow-wrap:anywhere}
+
+/* form */
+.alan{margin-top:18px}
+.alan input{width:100%;background:transparent;color:var(--ink);font:inherit;
+  font-size:15px;font-weight:900;letter-spacing:.01em;text-transform:uppercase;
+  border:0;border-bottom:1px solid var(--rule);padding:12px 0 14px;outline:none;
+  font-variation-settings:"wdth" 76,"wght" 900}
+.alan input:focus{border-bottom-color:var(--ink)}
+.alan input.not{text-transform:none;font-size:13px;font-weight:700;font-variation-settings:normal}
+.alan input::placeholder{color:var(--faint)}
+.ipucu{margin-top:7px;font-size:11px;color:var(--soft);line-height:1.5}
+
+/* durum kutusu */
+.kutu{margin-top:18px;border:1px dashed rgba(237,237,234,.3);padding:13px}
+.kutu .bas{display:flex;gap:8px;align-items:flex-start;font-size:12.5px;font-weight:900;
+  text-transform:uppercase;letter-spacing:.01em;line-height:1.25}
+.kutu p{font-size:11px;line-height:1.6;color:var(--dim);margin-top:9px}
+.ozet{margin-top:12px;border-top:1px solid var(--rule)}
+.ozet div{display:flex;gap:10px;padding:9px 0;border-bottom:1px solid var(--rule);align-items:baseline}
+.ozet .k{width:78px;flex:0 0 auto;font-size:11px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--soft)}
+.ozet .v{font-size:12.5px;font-weight:800;overflow-wrap:anywhere;min-width:0}
+
+/* ilk giriş */
+.adim{border-top:1px solid var(--rule);padding:12px 0;display:flex;gap:12px;align-items:baseline}
+.adim .no{font-size:20px;line-height:1;letter-spacing:-.03em;color:var(--soft);width:26px;flex:0 0 auto;
+  font-variation-settings:"wdth" 68,"wght" 900;font-variant-numeric:tabular-nums}
+.adim b{display:block;font-size:12.5px;font-weight:900;text-transform:uppercase;letter-spacing:.01em}
+.adim span{display:block;font-size:11px;color:var(--soft);margin-top:4px;line-height:1.5}
+
+/* yönetici: istek kartı */
+.istek{border-top:1px solid var(--rule);padding:13px 0}
+.istek .ust{display:flex;align-items:baseline;gap:10px}
+.istek .ust b{font-size:12.5px;font-weight:900;text-transform:uppercase;letter-spacing:.01em;min-width:0;overflow-wrap:anywhere}
+.istek .ust .rozet{margin-left:auto;flex:0 0 auto;background:var(--yukle);color:var(--ink);padding:3px 8px;border-radius:2px;
+  font-size:11px;font-weight:800;letter-spacing:.2em;text-transform:uppercase}
+.istek .mail{font-size:11px;font-weight:800;letter-spacing:.04em;color:var(--soft);margin-top:4px;overflow-wrap:anywhere}
+.istek .not{margin-top:9px;font-size:12px;line-height:1.5;color:var(--dim);border-left:2px solid var(--rule);padding-left:9px}
+.istek .not.yok{color:var(--soft);font-style:italic}
+.istek .akt{display:flex;gap:6px;margin-top:10px}
+.istek .akt .btn{margin-top:0;min-height:44px;flex:1}
+/* Tekrar istek işareti: sınırsız tekrar serbest olduğu için yönetici bunun
+   daha önce reddettiği biri olduğunu bilmeli. */
+.tekrar{margin-top:7px;display:flex;gap:6px;font-size:11px;font-weight:800;letter-spacing:.04em;color:var(--ink);line-height:1.5}
+.tekrar .ic{width:15px;height:15px;margin-top:1px}
+.sonuc{margin-top:10px;display:flex;gap:8px;font-size:11px;font-weight:800;letter-spacing:.04em;color:var(--soft);line-height:1.5}
+</style>
+</head>
+<body>
+<div class="tools" id="tools"></div>
+<div class="device"><div class="sc" id="screen"></div></div>
+
+<script>
+const P = {
+  info: '<path d="M12,12 L12,15"/><line class="nokta" x1="12" y1="9" x2="12" y2="9"/><circle cx="12" cy="12" r="10"/>',
+  time: '<circle cx="12" cy="12" r="10"/><polyline points="12 5 12 12 16 16"/>',
+  tik:  '<polyline points="4 13 9 18 20 7"/>',
+  kapat:'<path d="M6 6L18 18M18 6L6 18"/>',
+};
+/* Kullanıcının yazdığı her şey ekrana kaçışla basılır. */
+const esc = v => String(v).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const ic = n => `<svg class="ic" viewBox="0 0 24 24" aria-hidden="true">${P[n]}</svg>`;
+
+const HESAP = {mail:'selo.1999@example.com', googleAd:'selo_1999'};
+const S = {ekran:'kapak', ad:'', not:'', gonderilen:null, tekrar:false};
+
+const EKRAN = [
+  ['kapak','Karşılama'], ['istek','İstek'], ['bekliyor','Bekliyor'],
+  ['ret','Kabul edilmedi'], ['hosgeldin','İlk giriş'], ['yonetici','Yönetici']
+];
+
+function kapak(){
+  return `
+    <div class="mast"><span>Fotoğraf kulübü</span><span class="r">20 üye</span></div>
+    <div class="rb"></div>
+    <div class="kapak" style="margin-top:14px"><img src="https://picsum.photos/seed/giris-kapak/900/1100" alt=""></div>
+    <div class="marka">Creato&shy;graphers</div>
+    <p class="lede">İki ayda bir buluşup çekiyoruz, kareleri isimsiz oyluyoruz.</p>
+    <div class="bosluk"></div>
+    <button class="btn" data-a="google">Google ile gir</button>
+    <div class="alt-bilgi">Kulüp davetle çalışıyor. Hesabın listede yoksa yöneticiye istek bırakabilirsin.</div>`;
+}
+
+function istek(){
+  const dolu = S.ad.trim().length >= 2;
+  return `
+    <div class="mast"><span>Creatographers</span><span class="r">Giriş</span></div>
+    <div class="rb"></div>
+    <h2 class="t">${S.tekrar ? 'Tekrar<br>istek bırak' : 'Kulüpte<br>henüz yoksun'}</h2>
+    <p class="lede">${S.tekrar
+      ? 'Önceki isteğin kabul edilmedi. Yönetici bu isteğin tekrar olduğunu görecek; notuna neden tekrar istediğini yazabilirsin.'
+      : 'Bu hesap kulübün listesinde değil. Yöneticiye istek bırak, onaylayınca girebilirsin.'}</p>
+    <div class="hesap"><span class="lab">Google hesabın</span><b>${HESAP.mail}</b></div>
+    <div class="alan">
+      <label class="lab" for="ad">Adın soyadın</label>
+      <input id="ad" value="${esc(S.ad)}" placeholder="ÖRNEK: SELİN ARI" maxlength="40" autocomplete="name">
+      <div class="ipucu">Kulüpte bu adla görüneceksin.</div>
+    </div>
+    <div class="alan">
+      <label class="lab" for="not">Yöneticiye not · isteğe bağlı</label>
+      <input id="not" class="not" value="${esc(S.not)}" placeholder="Kulüpten kimi tanıyorsun?" maxlength="80">
+    </div>
+    <div class="bosluk"></div>
+    <button class="btn" data-a="gonder" ${dolu?'':'disabled'}>İsteği gönder</button>
+    <button class="link" data-a="baska">Başka hesapla gir</button>`;
+}
+
+function ozet(){
+  const g = S.gonderilen || {ad:'Selin Arı', not:'Deniz Yılmaz beni çağırdı'};
+  return `<div class="ozet">
+    <div><span class="k">Ad</span><span class="v">${esc(g.ad)}</span></div>
+    <div><span class="k">Hesap</span><span class="v">${HESAP.mail}</span></div>
+    <div><span class="k">Not</span><span class="v">${g.not ? esc(g.not) : 'Not bırakmadın'}</span></div></div>`;
+}
+
+function bekliyor(){
+  return `
+    <div class="mast"><span>Creatographers</span><span class="r">Giriş</span></div>
+    <div class="rb"></div>
+    <h2 class="t">İsteğin<br>yöneticide</h2>
+    <div class="kutu">
+      <div class="bas">${ic('time')}<span>Onay bekleniyor</span></div>
+      <p>Yönetici onaylayınca uygulamayı açtığında doğrudan içeri girersin. Uygulama bildirim göndermiyor; istersen yöneticiye kulübün WhatsApp grubundan haber ver.</p>
+    </div>
+    <div class="sec">Gönderdiğin</div>
+    ${ozet()}
+    <div class="bosluk"></div>
+    <button class="link" data-a="baska">Başka hesapla gir</button>`;
+}
+
+function ret(){
+  return `
+    <div class="mast"><span>Creatographers</span><span class="r">Giriş</span></div>
+    <div class="rb"></div>
+    <h2 class="t">İsteğin<br>kabul<br>edilmedi</h2>
+    <div class="kutu">
+      <div class="bas">${ic('info')}<span>Bu hesapla kulübe giremiyorsun</span></div>
+      <p>Yönetici bu isteği onaylamadı. Bir yanlışlık olduğunu düşünüyorsan notuna bunu yazarak tekrar isteyebilirsin.</p>
+    </div>
+    <div class="sec">Gönderdiğin</div>
+    ${ozet()}
+    <div class="bosluk"></div>
+    <button class="btn" data-a="tekrar">Tekrar istek bırak</button>
+    <button class="link" data-a="baska">Başka hesapla gir</button>`;
+}
+
+function hosgeldin(){
+  const ad = (S.gonderilen && S.gonderilen.ad) || 'Selin Arı';
+  return `
+    <div class="mast"><span>Creatographers</span><span class="r">20 üye</span></div>
+    <div class="rb"></div>
+    <h2 class="t">Hoş geldin,<br>${esc(ad.split(' ')[0])}</h2>
+    <p class="lede">İsteğin onaylandı. Kulüp şöyle işliyor:</p>
+    <div class="sec">Bir etkinlik</div>
+    <div class="adim"><span class="no">01</span><span><b>Buluşup çekiyoruz</b>
+      <span>Her temaya bir kare yüklüyorsun. Bazı temalar buluşma günü çekiliyor.</span></span></div>
+    <div class="adim"><span class="no">02</span><span><b>İsimsiz oyluyoruz</b>
+      <span>Her kareye 1 ile 10 arası puan. Kimin çektiği sonuçlara kadar gizli.</span></span></div>
+    <div class="adim"><span class="no">03</span><span><b>Sonuçlar açılıyor</b>
+      <span>Kazanan kareler ve galeri. Kendi ortalamanı sadece sen görüyorsun.</span></span></div>
+    <div class="bosluk"></div>
+    <button class="btn" data-a="devam">Etkinliklere geç</button>`;
+}
+
+const ISTEKLER0 = () => ([
+  {ad:'Selin Arı', mail:'selo.1999@example.com', not:'Deniz Yılmaz beni çağırdı', durum:'bekliyor'},
+  {ad:'Kaan Demirtaş', mail:'kaan.dmr@example.com', not:'', durum:'bekliyor', onceki:1},
+]);
+let ISTEKLER = ISTEKLER0();
+
+function yonetici(){
+  const bekleyen = ISTEKLER.filter(i=>i.durum==='bekliyor').length;
+  return `
+    <div class="mast"><span>Yönetim</span><span class="r">Üyeler</span></div>
+    <div class="rb"></div>
+    <div class="sec">Katılma istekleri<span>${bekleyen} bekliyor</span></div>
+    ${ISTEKLER.map((r,i)=>`
+      <div class="istek">
+        <div class="ust"><b>${r.ad}</b>${r.durum==='bekliyor'?'<span class="rozet">Bekliyor</span>':''}</div>
+        <div class="mail">${r.mail}</div>
+        ${r.onceki ? `<div class="tekrar">${ic('info')}<span>Daha önce ${r.onceki} kez reddedildi</span></div>` : ''}
+        <div class="not ${r.not?'':'yok'}">${r.not || 'Not bırakmamış'}</div>
+        ${r.durum==='bekliyor'
+          ? `<div class="akt"><button class="btn ik" data-red="${i}">${ic('kapat')}Reddet</button>
+             <button class="btn" data-onay="${i}">${ic('tik')}Onayla</button></div>`
+          : `<div class="sonuc">${ic(r.durum==='onay'?'tik':'kapat')}<span>${
+              r.durum==='onay' ? 'Onaylandı. Uygulamayı açınca içeri girecek.' : 'Reddedildi. Kişi bunu görecek.'}</span></div>`}
+      </div>`).join('')}
+    <div class="sec">Üyeler<span>20 üye</span></div>
+    <p class="lede" style="margin-top:8px">Üye listesi ve roller yönetim ekranındaki gibi.</p>`;
+}
+
+const CIZ = {kapak, istek, bekliyor, ret, hosgeldin, yonetici};
+
+function ciz(){
+  document.getElementById('screen').innerHTML = CIZ[S.ekran]();
+  document.getElementById('tools').innerHTML = `<span class="lbl">Ekran</span>` +
+    EKRAN.map(([k,a])=>`<button class="${S.ekran===k?'on':''}" data-e="${k}">${a}</button>`).join('');
+  const ad = document.getElementById('ad');
+  if(ad){
+    ad.addEventListener('input',()=>{ S.ad=ad.value;
+      document.querySelector('[data-a="gonder"]').disabled = S.ad.trim().length < 2; });
+    document.getElementById('not').addEventListener('input',e=>{ S.not=e.target.value; });
+  }
+}
+
+document.addEventListener('click', e=>{
+  const ek = e.target.closest('[data-e]');
+  if(ek){ S.ekran = ek.dataset.e; if(S.ekran==='yonetici') ISTEKLER=ISTEKLER0(); return ciz(); }
+  const on = e.target.closest('[data-onay]');
+  if(on){ ISTEKLER[+on.dataset.onay].durum='onay'; return ciz(); }
+  const rd = e.target.closest('[data-red]');
+  if(rd){ ISTEKLER[+rd.dataset.red].durum='red'; return ciz(); }
+  const a = e.target.closest('[data-a]');
+  if(!a || a.disabled) return;
+  switch(a.dataset.a){
+    case 'google': S.ekran='istek'; break;
+    case 'gonder': S.gonderilen={ad:S.ad.trim(), not:S.not.trim()}; S.ekran='bekliyor'; break;
+    case 'baska':  S.ekran='kapak'; S.ad=''; S.not=''; S.tekrar=false; break;
+    /* Reddedilen kişi sınırsız tekrar isteyebilir. Ad önceki istekten gelir, not boşalır. */
+    case 'tekrar': { const g = S.gonderilen || {ad:'Selin Arı'};
+                     S.ad=g.ad; S.not=''; S.tekrar=true; S.ekran='istek'; break; }
+    case 'devam':  S.ekran='kapak'; break;
+  }
+  ciz();
+});
+
+ciz();
+</script>
+</body>
+</html>
