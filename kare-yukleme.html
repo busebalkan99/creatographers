@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,maximum-scale=1">
+<title>Creatographers · kare yükleme</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&display=swap" rel="stylesheet">
+<style>
+/* ==========================================================
+   Kare yükleme ekranı (eksik ekranlardan ilki)
+   Yerleşim: kontakt baskı. Üç tema yan yana küçük, seçili tema altta büyük.
+   Kurallar: tema başına 1 kare (karar 3), çekim şartı (29) ve tarih kontrolü (92),
+   yükleme kapanana kadar değiştirme ve kaldırma, kaldıran o temayı oylamak
+   zorunda değil, kulüp afişi izni (41).
+   Aşama rengi turuncu (47); yüklenirken dolan çubuk ışıyor (60, süren iş).
+   Hata mesajı kırmızı değil, renkler aşamaya ayrılmış.
+   ========================================================== */
+:root{
+  --paper:#0A0A0B;
+  --ink:#EDEDEA;
+  --dim:rgba(237,237,234,.58);
+  --soft:rgba(237,237,234,.49);   /* metin tabanı, zeminden 4,50:1 */
+  --faint:rgba(237,237,234,.30);  /* yalnız dekoratif */
+  --rule:rgba(237,237,234,.18);
+  --grain:.045;
+  --pad:16px;
+  --acc:#B52D12;                  /* yükleme aşaması, yağlı kalem */
+  --glow:0 0 7px rgba(181,45,18,.7), 0 0 22px rgba(181,45,18,.34);
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{background:#050506;color:var(--ink);font-family:"Archivo",system-ui,sans-serif;
+  display:flex;flex-direction:column;align-items:center;gap:12px;padding:16px 0;overflow:auto}
+
+/* ---------- prototip aracı (cihazın dışında) ---------- */
+.tools{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;max-width:460px;padding:0 12px}
+.tools .lbl{width:100%;text-align:center;font-size:9px;font-weight:800;letter-spacing:.18em;
+  text-transform:uppercase;color:var(--soft);margin-top:4px}
+.tools button{appearance:none;border:1px solid var(--rule);background:transparent;color:var(--dim);
+  font:inherit;font-size:9.5px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;
+  padding:9px 10px;cursor:pointer;border-radius:2px}
+.tools button.on{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+
+.device{width:min(390px,100vw);height:844px;max-height:calc(100dvh - 150px);
+  position:relative;overflow:hidden;background:var(--paper);border:1px solid var(--rule);
+  display:flex;flex-direction:column;flex:0 0 auto}
+.device::after{content:'';position:absolute;inset:0;z-index:30;pointer-events:none;opacity:var(--grain);
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E")}
+.sc{flex:1;min-height:0;overflow-y:auto;padding:14px var(--pad) 18px;scrollbar-width:none}
+.sc::-webkit-scrollbar{display:none}
+
+/* ---------- işaretler (karar 75: Ikonate, keskin uç) ---------- */
+/* İkon boyu yanındaki yazının ilk satır yüksekliği kadar, çizgisi 2px.
+   1,6'lık çizgi en kalın ağırlıktaki yazının yanında cılız kalıyordu. */
+.ic{width:18px;height:18px;flex:0 0 auto;stroke:currentColor;fill:none;stroke-width:2}
+.ic *{stroke-linecap:butt;stroke-linejoin:miter}
+/* Sıfır uzunluklu çizgi (bilgi ikonundaki nokta) keskin uçla hiç çizilmiyor.
+   Kare uç hem görünür hem keskin. */
+.ic .nokta{stroke-linecap:square}
+
+.mast{display:flex;align-items:center;font-size:11px;font-weight:800;letter-spacing:.2em;
+  text-transform:uppercase;color:var(--soft)}
+.mast .geri{appearance:none;border:0;background:none;color:inherit;font:inherit;letter-spacing:inherit;
+  text-transform:inherit;display:flex;align-items:center;gap:7px;cursor:pointer;min-height:32px}
+.mast .geri .ic{width:14px;height:14px}
+.mast .r{margin-left:auto}
+.rb{height:4px;background:var(--ink);margin-top:6px}
+h2.t{font-size:30px;line-height:.86;letter-spacing:-.04em;text-transform:uppercase;margin-top:12px;
+  font-variation-settings:"wdth" 70,"wght" 900}
+.kal{margin-top:8px;font-size:11px;font-weight:800;letter-spacing:.04em;color:var(--soft);line-height:1.5}
+.kal b{color:var(--ink)}
+
+/* ---------- kontakt baskı ---------- */
+.kontakt{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;margin-top:14px}
+.k{appearance:none;border:0;background:none;color:inherit;font:inherit;text-align:left;cursor:pointer;padding:0}
+.kk{height:92px;display:flex;align-items:center;justify-content:center;background:#141416;position:relative}
+.kk.b{border:1px dashed rgba(237,237,234,.3);background:none;color:var(--soft)}
+.kk.b .ic{width:22px;height:22px}
+.kk img{width:100%;height:100%;object-fit:contain;display:block}
+.kk .mini{position:absolute;left:8px;right:8px;top:50%;transform:translateY(-50%)}
+.k.secili .kk{outline:2px solid var(--ink);outline-offset:-2px}
+.k .ad{font-size:11px;font-weight:900;letter-spacing:.14em;text-transform:uppercase;margin-top:6px}
+.k .d{font-size:10px;font-weight:700;color:var(--soft);margin-top:2px}
+
+/* seviye-1 bölüm başlığı (karar 79) */
+.sec{margin-top:22px;border-top:4px solid var(--ink);padding-top:11px;
+  font-size:13px;font-weight:900;letter-spacing:.16em;text-transform:uppercase}
+.sart{font-size:11px;font-weight:800;letter-spacing:.04em;color:var(--soft);margin-top:5px}
+
+/* ---------- seçili temanın kutusu ---------- */
+.bos{margin-top:10px;width:100%;appearance:none;background:none;color:var(--dim);font:inherit;cursor:pointer;
+  border:1px dashed rgba(237,237,234,.3);min-height:150px;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:8px}
+.bos .ic{width:24px;height:24px;color:var(--ink)}
+.bos b{font-size:12px;font-weight:900;letter-spacing:.14em;text-transform:uppercase;color:var(--ink)}
+.bos span{font-size:11px;color:var(--soft)}
+.yuk{margin-top:10px;border:1px solid var(--rule);min-height:150px;display:flex;flex-direction:column;
+  justify-content:center;padding:0 14px;gap:10px}
+.yuk b{font-size:12px;font-weight:900;letter-spacing:.14em;text-transform:uppercase}
+.bar{height:4px;background:rgba(237,237,234,.14)}
+.bar i{display:block;height:100%;background:var(--acc);box-shadow:var(--glow)}
+.yuk span{font-size:11px;color:var(--soft)}
+.dolu img{margin-top:10px;width:100%;max-height:230px;object-fit:contain;background:#141416;display:block}
+.dolu .tar{margin-top:6px;font-size:11px;font-weight:700;color:var(--soft);font-variant-numeric:tabular-nums}
+.akt{display:flex;gap:6px;margin-top:8px}
+.btn{appearance:none;border:0;background:var(--ink);color:var(--paper);border-radius:2px;cursor:pointer;
+  font:inherit;font-size:11px;font-weight:800;letter-spacing:.2em;text-transform:uppercase;min-height:48px;
+  display:flex;align-items:center;justify-content:center;gap:8px;width:100%}
+.btn .ic{width:16px;height:16px}
+.btn.ik{background:none;color:var(--ink);box-shadow:inset 0 0 0 1px var(--rule)}
+.akt .btn{flex:1}
+
+/* ret ve onay bloğu: kesikli çerçeve (yönetim ekranındaki uyarı dili) */
+.ret{margin-top:10px;border:1px dashed rgba(237,237,234,.3);padding:12px}
+.ret .ust{display:flex;gap:10px;align-items:flex-start}
+.ret img{width:64px;height:48px;object-fit:contain;background:#141416;flex:0 0 auto}
+.ret img.soluk{opacity:.55}
+/* İkon | [başlık, tarih] : tarih satırı başlık yazısıyla aynı sütunda başlıyor.
+   Önce tarih ikonun hizasından başlıyordu, iki satır farklı sütundaydı. */
+.ret .baslik{display:flex;gap:8px;align-items:flex-start}
+.ret .baslik .ic{width:16px;height:16px}
+.ret .bt{display:block;font-size:12.5px;font-weight:900;text-transform:uppercase;letter-spacing:.01em;line-height:1.25}
+.ret .tar{display:block;font-size:11px;font-weight:800;color:var(--soft);margin-top:4px;font-variant-numeric:tabular-nums;
+  text-transform:none;letter-spacing:0;line-height:1.4}
+.ret p{font-size:11px;line-height:1.6;color:var(--dim);margin-top:10px}
+.ret .btn{margin-top:10px}
+
+/* Kilit 11 puntoluk satırın yanında 15px, ilk satırın ortasına oturuyor.
+   18px'te harflerin üstünden taşıyor, altından sarkıyordu. */
+.kilit .ic{width:15px;height:15px;margin-top:1px}
+.kilit{margin-top:10px;display:flex;gap:8px;font-size:11px;font-weight:800;letter-spacing:.04em;
+  color:var(--soft);border-top:1px solid var(--rule);padding-top:10px;line-height:1.55}
+
+/* kulüp afişi izni (karar 41) */
+.izin{margin-top:22px;border-top:1px solid var(--rule);display:flex;gap:11px;padding:12px 0;cursor:pointer;
+  width:100%;appearance:none;background:none;border-left:0;border-right:0;border-bottom:0;color:inherit;font:inherit;text-align:left}
+.box{width:20px;height:20px;flex:0 0 auto;border:1px solid var(--ink);border-radius:2px;position:relative;margin-top:1px}
+.box.on{background:var(--ink)}
+.box.on::after{content:'';position:absolute;left:50%;top:46%;width:5px;height:9px;border:solid var(--paper);
+  border-width:0 2px 2px 0;transform:translate(-50%,-50%) rotate(45deg)}
+.izin b{display:block;font-size:12.5px;font-weight:900;text-transform:uppercase;color:var(--ink)}
+/* yalnız açıklama satırı sönük; dış kapsayıcı span'e geçince başlık da sönüyordu */
+.izin b + span{display:block;font-size:11px;color:var(--soft);margin-top:4px;line-height:1.5}
+
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{transition-duration:.001ms!important}}
+</style>
+</head>
+<body>
+<div class="tools" id="tools"></div>
+<div class="device"><div class="sc" id="screen"></div></div>
+
+<script>
+/* ---------- işaretler ---------- */
+const P = {
+  plus:  '<path d="M20 12L4 12M12 4L12 20"/>',
+  cal:   '<path d="M3 5H21V21H3V5Z"/><path d="M21 9H3"/><path d="M7 5V3"/><path d="M17 5V3"/><path d="M15 18L8.99999 12"/><path d="M15 12L9 18"/>',
+  info:  '<path d="M12,12 L12,15"/><line class="nokta" x1="12" y1="9" x2="12" y2="9"/><circle cx="12" cy="12" r="10"/>',
+  bin:   '<path d="M19 6L5 6M14 5L10 5M6 10L6 20C6 20.6666667 6.33333333 21 7 21 7.66666667 21 11 21 17 21 17.6666667 21 18 20.6666667 18 20 18 19.3333333 18 16 18 10"/>',
+  yenile:'<polyline points="22 12 19 15 16 12"/><path d="M11,20 C6.581722,20 3,16.418278 3,12 C3,7.581722 6.581722,4 11,4 C15.418278,4 19,7.581722 19,12 L19,14"/>',
+  kilit: '<rect width="14" height="10" x="5" y="11"/><path d="M12,3 L12,3 C14.7614237,3 17,5.23857625 17,8 L17,11 L7,11 L7,8 C7,5.23857625 9.23857625,3 12,3 Z"/>',
+  geri:  '<path d="M9 6l-6 6 6 6"/><path d="M21 12H4"/><path d="M3 12h1"/>',
+};
+const ic = n => `<svg class="ic" viewBox="0 0 24 24" aria-hidden="true">${P[n]}</svg>`;
+
+/* ---------- veri ---------- */
+/* Buluşma günü 14 Eylül. Kural: bir gün önce ya da sonra da kabul (13-15 Eylül).
+   Pay ekranda söylenmiyor. */
+const BULUSMA = {g:14, ay:'Eylül'};
+const DOSYA = {
+  dogru:   {ad:'Doğru gün',        tarih:{g:14,ay:9,y:2026}, seed:'dosya-dogru'},
+  gece:    {ad:'Gece yarısı kayması', tarih:{g:15,ay:9,y:2026}, seed:'dosya-gece'},
+  yanlis:  {ad:'Yanlış gün',        tarih:{g:3,ay:8,y:2026},  seed:'dosya-yanlis'},
+  ayarsiz: {ad:'Saati ayarsız makine', tarih:{g:14,ay:3,y:2019}, seed:'dosya-ayarsiz'},
+  tarihsiz:{ad:'Tarihsiz (WhatsApp)', tarih:null,              seed:'dosya-tarihsiz'},
+};
+const AYLAR=['','Ocak','Şubat','Mart','Nisan','Mayıs','Haziran','Temmuz','Ağustos','Eylül','Ekim','Kasım','Aralık'];
+const tarihYaz = t => t ? `${t.g} ${AYLAR[t.ay]}${t.y!==2026?' '+t.y:''}` : 'bilinmiyor';
+
+const TEMA0 = () => ([
+  {ad:'Sokak',  bulusma:true,  durum:'dolu', dosya:'dogru'},
+  {ad:'Portre', bulusma:false, durum:'bos'},
+  {ad:'Gece',   bulusma:true,  durum:'bos'},
+]);
+
+const S = {senaryo:'acik', sec:2, secilecek:'dogru', afis:true, T:TEMA0()};
+
+/* ---------- kural ---------- */
+function kontrol(tema, dosyaKey){
+  if(!tema.bulusma) return {ok:true};          /* serbest temada tarih bakılmaz */
+  const t = DOSYA[dosyaKey].tarih;
+  if(!t) return {ok:false, neden:'yok'};
+  const ayni = t.y===2026 && t.ay===9 && Math.abs(t.g-BULUSMA.g)<=1;
+  return ayni ? {ok:true} : {ok:false, neden:'gun'};
+}
+
+/* ---------- çizim ---------- */
+function ust(){
+  const tamam = S.T.filter(t=>t.durum==='dolu').length;
+  const kal = S.senaryo==='kapali'
+    ? `Yükleme kapandı · <b>oylama yarın 10.00'da</b> açılıyor`
+    : `<b>31 saat</b> kaldı · ${tamam} / 3 tema tamam`;
+  return `<div class="mast"><button class="geri">${ic('geri')}Etkinlikler</button><span class="r">Yükleme</span></div>
+    <div class="rb"></div>
+    <h2 class="t">Kareni<br>yükle</h2>
+    <div class="kal">${kal}</div>`;
+}
+
+function kontakt(){
+  return `<div class="kontakt">${S.T.map((t,i)=>{
+    const d = t.durum==='dolu' ? 'yüklendi' : t.durum==='yuk' ? 'yükleniyor'
+            : t.ret ? 'yüklenmedi' : 'boş';
+    let ic_ = '';
+    if(t.durum==='dolu') ic_ = `<img src="https://picsum.photos/seed/${DOSYA[t.dosya].seed}/300/200" alt="">`;
+    else if(t.durum==='yuk') ic_ = `<div class="mini"><div class="bar"><i style="width:${t.pct}%"></i></div></div>`;
+    else ic_ = ic('plus');
+    return `<button class="k ${i===S.sec?'secili':''}" data-sec="${i}">
+      <div class="kk ${t.durum==='dolu'?'':'b'}">${ic_}</div>
+      <div class="ad">${t.ad}</div><div class="d">${d}</div></button>`;
+  }).join('')}</div>`;
+}
+
+function govde(){
+  const t = S.T[S.sec];
+  const sart = t.bulusma ? `Buluşmada çekilir · ${BULUSMA.g} ${BULUSMA.ay} cumartesi`
+                         : 'Serbest, istediğin gün çekebilirsin';
+  let h = `<div class="sec">${t.ad}</div><div class="sart">${sart}</div>`;
+  const kapali = S.senaryo==='kapali';
+
+  if(t.durum==='yuk'){
+    h += `<div class="yuk"><b>Yükleniyor</b><div class="bar"><i style="width:${t.pct}%"></i></div>
+          <span>${t.bulusma?'Çekim tarihi kontrol ediliyor':'Kare yükleniyor'}</span></div>`;
+  }
+  else if(t.onay){
+    h += `<div class="ret"><div class="ust"><img src="https://picsum.photos/seed/${DOSYA[t.dosya].seed}/300/200" alt="">
+      <div class="baslik"><span class="bt">Kareni kaldırmak istiyor musun?
+        <span class="tar">Yükleme kapanana kadar yenisini koyabilirsin</span></span></div></div>
+      <p>Kaldırırsan bu temaya katılmamış olursun. Bu temayı oylamak zorunda kalmazsın, istersen yine oylayabilirsin.</p>
+      <button class="btn" data-a="kaldir">${ic('bin')}Kaldır</button>
+      <button class="btn ik" data-a="vazgec" style="margin-top:6px">Vazgeç</button></div>`;
+  }
+  else if(t.ret){
+    const f = DOSYA[t.ret.dosya];
+    const baska = f.tarih && f.tarih.y!==2026;
+    const metin = t.ret.neden==='gun'
+      ? `${t.ad} temasını ${BULUSMA.g} ${BULUSMA.ay} cumartesi günkü buluşmada çekiyoruz.${baska?' Makinenin saati ayarlı değilse tarih yanlış çıkar.':''}`
+      : `WhatsApp'tan gelen ya da bilgileri silinerek dışa aktarılan dosyalarda tarih kalmıyor. Makineden aktardığın orijinal dosyayı seç.`;
+    const tarS = `<span class="tar">Çekildiği gün: ${tarihYaz(f.tarih)}</span>`;
+    const bas = t.ret.neden==='gun'
+      ? `${ic('cal')}<span class="bt">Bu kare buluşma günü çekilmemiş${tarS}</span>`
+      : `${ic('info')}<span class="bt">Bu dosyada çekim tarihi yok${tarS}</span>`;
+    h += `<div class="ret"><div class="ust"><img class="soluk" src="https://picsum.photos/seed/${f.seed}/300/200" alt="">
+      <div class="baslik">${bas}</div></div>
+      <p>${metin}</p>
+      ${t.durum==='dolu' ? `<p>Önceki karen yerinde duruyor.</p>` : ''}
+      <button class="btn" data-a="sec">${ic('yenile')}Başka kare seç</button>
+      ${t.durum==='dolu' ? `<button class="btn ik" data-a="kapat" style="margin-top:6px">Öncekiyle devam et</button>` : ''}
+    </div>`;
+  }
+  else if(t.durum==='dolu'){
+    const f = DOSYA[t.dosya];
+    h += `<div class="dolu"><img src="https://picsum.photos/seed/${f.seed}/900/600" alt="">
+      <div class="tar">Çekildiği gün: ${tarihYaz(f.tarih)}</div></div>`;
+    if(kapali){
+      h += `<div class="kilit">${ic('kilit')}<span>Yükleme kapandı, kareler artık değişmiyor.</span></div>`;
+    } else {
+      h += `<div class="akt"><button class="btn ik" data-a="sec">${ic('yenile')}Değiştir</button>
+            <button class="btn ik" data-a="sor">${ic('bin')}Kaldır</button></div>`;
+    }
+  }
+  else { /* boş */
+    if(kapali){
+      h += `<div class="kilit">${ic('kilit')}<span>Yükleme kapandı. Bu temaya kare vermedin; bu temayı oylamak zorunda değilsin.</span></div>`;
+    } else {
+      h += `<button class="bos" data-a="sec">${ic('plus')}<b>Kare seç</b><span>Makineden aktardığın orijinal dosya</span></button>`;
+    }
+  }
+  return h;
+}
+
+function izin(){
+  return `<button class="izin" data-a="afis"><span class="box ${S.afis?'on':''}"></span>
+    <span><b>Kulüp afişi</b><span>Kazanırsam karem kulüp afişinde kullanılabilir.</span></span></button>`;
+}
+
+function ciz(){
+  document.getElementById('screen').innerHTML = ust() + kontakt() + govde() + izin();
+  const sen = [['acik','Yükleme açık'],['kapali','Yükleme kapandı']];
+  document.getElementById('tools').innerHTML =
+    `<span class="lbl">Durum</span>` +
+    sen.map(([k,a])=>`<button class="${S.senaryo===k?'on':''}" data-sen="${k}">${a}</button>`).join('') +
+    `<span class="lbl">Seçilecek dosya (deneme)</span>` +
+    Object.entries(DOSYA).map(([k,f])=>`<button class="${S.secilecek===k?'on':''}" data-dosya="${k}">${f.ad}</button>`).join('');
+}
+
+/* ---------- akış ---------- */
+function yukle(i){
+  const t = S.T[i], dosya = S.secilecek;
+  t.ret = null; t.onay = false;
+  const onceki = t.durum==='dolu' ? {durum:'dolu', dosya:t.dosya} : null;
+  t.durum='yuk'; t.pct=0; ciz();
+  const tik = setInterval(()=>{
+    t.pct += 20;
+    if(t.pct >= 100){
+      clearInterval(tik);
+      const r = kontrol(t, dosya);
+      if(r.ok){ t.durum='dolu'; t.dosya=dosya; t.ret=null; }
+      else {
+        /* Değiştirme reddedilirse önceki kare yerinde kalır. */
+        if(onceki){ t.durum='dolu'; t.dosya=onceki.dosya; } else { t.durum='bos'; }
+        t.ret = {neden:r.neden, dosya};
+      }
+    }
+    ciz();
+  }, 140);
+}
+
+document.addEventListener('click', e=>{
+  const s = e.target.closest('[data-sen]');
+  if(s){ S.senaryo=s.dataset.sen; S.T=TEMA0();
+    if(S.senaryo==='kapali'){ S.T[2]={...S.T[2],durum:'dolu',dosya:'dogru'}; S.sec=0; }
+    else S.sec=2;
+    return ciz(); }
+  const d = e.target.closest('[data-dosya]');
+  if(d){ S.secilecek=d.dataset.dosya; return ciz(); }
+  const k = e.target.closest('[data-sec]');
+  if(k){ S.sec=+k.dataset.sec; return ciz(); }
+  const a = e.target.closest('[data-a]');
+  if(!a) return;
+  const t = S.T[S.sec];
+  switch(a.dataset.a){
+    case 'sec':    if(S.senaryo!=='kapali') yukle(S.sec); break;
+    case 'sor':    t.onay=true; t.ret=null; ciz(); break;
+    case 'vazgec': t.onay=false; ciz(); break;
+    case 'kaldir': t.onay=false; t.durum='bos'; t.dosya=null; t.ret=null; ciz(); break;
+    case 'kapat':  t.ret=null; ciz(); break;
+    case 'afis':   S.afis=!S.afis; ciz(); break;
+  }
+});
+
+ciz();
+</script>
+</body>
+</html>

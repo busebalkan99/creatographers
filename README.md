@@ -12,10 +12,13 @@ Hepsi tarayıcıda çalışıyor, gerçek uygulama henüz yok. 390x844 telefon i
 | `index.html` | Kapak, bütün prototiplerin listesi |
 | `ana-ekran.html` | Etkinlikler arşivi, üç aşama yan yana |
 | `etkinlik.html` | Bitmiş bir etkinliğin sonucu: ödüller, tema sekmeleri, galeri, fotoğraf detayı |
+| `kare-yukleme.html` | Kare yükleme: kontakt baskı, çekim tarihi kontrolü, değiştir ve kaldır |
 | `oylama.html` | Oylama akışı, puan kaydırıcısı |
 | `oylama-zoom.html` | Aynısı, parmakla büyütme katmanıyla |
 | `profil-siralama.html` | Sezon sıralaması ve kişi profili, dört senaryo |
 | `tahmin.html` | Tahmin oyunu, beş ekran |
+| `tema-onerisi.html` | Tema önerisi, beş ekran |
+| `yonetim.html` | Yönetim: tema seçimi, etkinlik kurma, roller |
 | `temalar.html` | Görsel yön seçilirken denenen 22 tema |
 | `arsiv-oylama-v8.html` | Provoke öncesi oylama, karşılaştırma için |
 
