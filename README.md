@@ -1,9 +1,9 @@
-# Creatographers
+# Creatorgraphers
 
 Kapalı bir fotoğraf kulübü için tasarım prototipleri. 20 üye, iki ayda bir etkinlik,
 her etkinlikte birkaç tema, kişi başı tema başına bir kare.
 
-**Prototipler:** https://busebalkan99.github.io/creatographers/
+**Prototipler:** https://busebalkan99.github.io/creatorgraphers/
 
 Hepsi tarayıcıda çalışıyor, gerçek uygulama henüz yok. 390x844 telefon için tasarlandı.
 
